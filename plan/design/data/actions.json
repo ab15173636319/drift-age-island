@@ -1,0 +1,148 @@
+{
+  "// 说明": "所有行动定义。tier 对应 tiers.json 的档位；unlockRequires 支持 item:/region:/skill: 三种前缀",
+
+  "gathering": {
+    "pick_berries": {
+      "skill": "gathering", "tier": "T1", "unlockLevel": 1, "unlockRequires": [],
+      "durationSec": 3.5, "xp": 10, "output": { "berry": 1 },
+      "staminaCost": 1, "region": "north_beach", "riskEvents": []
+    },
+    "gather_nuts": {
+      "skill": "gathering", "tier": "T2", "unlockLevel": 5, "unlockRequires": [],
+      "durationSec": 4.0, "xp": 26, "output": { "nut": 2 },
+      "staminaCost": 1, "region": "north_beach", "riskEvents": []
+    },
+    "dig_root": {
+      "skill": "gathering", "tier": "T3", "unlockLevel": 12, "unlockRequires": [],
+      "durationSec": 4.5, "xp": 62, "output": { "root": 3 },
+      "staminaCost": 2, "region": "outer_forest", "riskEvents": []
+    },
+    "collect_seed_soil": {
+      "skill": "gathering", "tier": "T3", "unlockLevel": 12, "unlockRequires": ["building:herb_garden"],
+      "durationSec": 4.5, "xp": 62, "output": { "seed": 1, "soil": 3 },
+      "staminaCost": 2, "region": "outer_forest", "riskEvents": []
+    },
+    "outer_forest_gather": {
+      "skill": "gathering", "tier": "T4", "unlockLevel": 22, "unlockRequires": ["region:outer_forest"],
+      "durationSec": 5.0, "xp": 145, "output": { "berry": 5, "nut": 3 },
+      "staminaCost": 3, "region": "outer_forest",
+      "riskEvents": [ { "id": "snake", "chance": 0.10 }, { "id": "mosquito", "chance": 0.05 } ]
+    },
+    "rare_herb_search": {
+      "skill": "gathering", "tier": "T5", "unlockLevel": 35, "unlockRequires": ["region:deep_forest"],
+      "durationSec": 5.5, "xp": 320, "output": { "herb": 8 },
+      "staminaCost": 4, "region": "deep_forest", "riskEvents": [ { "id": "mosquito", "chance": 0.08 } ]
+    },
+    "deep_mushroom": {
+      "skill": "gathering", "tier": "T6", "unlockLevel": 55, "unlockRequires": ["region:deep_forest", "exploration:deep_forest:60"],
+      "durationSec": 6.0, "xp": 700, "output": { "mushroom": 12 },
+      "staminaCost": 5, "region": "deep_forest", "riskEvents": []
+    },
+    "master_gather": {
+      "skill": "gathering", "tier": "T7", "unlockLevel": 75, "unlockRequires": [],
+      "durationSec": 6.5, "xp": 1500, "output": { "berry": 6, "nut": 4, "herb": 4, "mushroom": 4 },
+      "staminaCost": 6, "region": "deep_forest", "riskEvents": []
+    }
+  },
+
+  "woodcutting": {
+    "pickup_branch": {
+      "skill": "woodcutting", "tier": "T1", "unlockLevel": 1, "unlockRequires": [],
+      "durationSec": 3.5, "xp": 10, "output": { "branch": 1 },
+      "staminaCost": 1, "region": "north_beach", "riskEvents": []
+    },
+    "collect_leaves": {
+      "skill": "woodcutting", "tier": "T1", "unlockLevel": 1, "unlockRequires": [],
+      "durationSec": 3.5, "xp": 10, "output": { "leaves": 1 },
+      "staminaCost": 1, "region": "north_beach", "riskEvents": []
+    },
+    "chop_softwood": {
+      "skill": "woodcutting", "tier": "T2", "unlockLevel": 5, "unlockRequires": ["item:stone_axe"],
+      "durationSec": 4.0, "xp": 26, "output": { "wood": 2 },
+      "staminaCost": 2, "region": "thorn_belt", "riskEvents": [ { "id": "bleeding", "chance": 0.15 } ]
+    },
+    "gather_vine": {
+      "skill": "woodcutting", "tier": "T3", "unlockLevel": 12, "unlockRequires": [],
+      "durationSec": 4.5, "xp": 62, "output": { "vine": 3 },
+      "staminaCost": 2, "region": "thorn_belt", "riskEvents": [ { "id": "bleeding", "chance": 0.10 } ]
+    },
+    "chop_bamboo": {
+      "skill": "woodcutting", "tier": "T3", "unlockLevel": 12, "unlockRequires": ["region:outer_forest"],
+      "durationSec": 4.5, "xp": 62, "output": { "bamboo": 3 },
+      "staminaCost": 3, "region": "outer_forest", "riskEvents": []
+    },
+    "chop_hardwood": {
+      "skill": "woodcutting", "tier": "T4", "unlockLevel": 22, "unlockRequires": ["item:metal_axe", "region:deep_forest"],
+      "durationSec": 5.0, "xp": 145, "output": { "hardwood": 5 },
+      "staminaCost": 4, "region": "deep_forest", "riskEvents": []
+    },
+    "deep_hardwood": {
+      "skill": "woodcutting", "tier": "T5", "unlockLevel": 35, "unlockRequires": ["region:deep_forest"],
+      "durationSec": 5.5, "xp": 320, "output": { "hardwood": 8 },
+      "staminaCost": 5, "region": "deep_forest", "riskEvents": []
+    },
+    "master_woodcut": {
+      "skill": "woodcutting", "tier": "T7", "unlockLevel": 75, "unlockRequires": [],
+      "durationSec": 6.5, "xp": 1500, "output": { "hardwood": 18 },
+      "staminaCost": 7, "region": "deep_forest", "riskEvents": []
+    }
+  },
+
+  "cooking": {
+    "start_fire": {
+      "skill": "cooking", "tier": "T1", "unlockLevel": 1, "unlockRequires": [],
+      "durationSec": 3.5, "xp": 10, "output": { "fire": 1 },
+      "staminaCost": 1, "region": "north_beach", "riskEvents": []
+    },
+    "cook_berry": {
+      "skill": "cooking", "tier": "T2", "unlockLevel": 5, "unlockRequires": ["building:firepit"],
+      "durationSec": 4.0, "xp": 26, "output": { "cooked_food": 2 },
+      "staminaCost": 1, "region": "north_beach", "riskEvents": []
+    },
+    "make_charcoal": {
+      "skill": "cooking", "tier": "T4", "unlockLevel": 22, "unlockRequires": [],
+      "durationSec": 5.0, "xp": 145, "output": { "charcoal": 5 },
+      "staminaCost": 2, "region": "north_beach", "riskEvents": []
+    }
+  },
+
+  "construction": {
+    "build_shelter": {
+      "skill": "construction", "tier": "T2", "unlockLevel": 5, "unlockRequires": [],
+      "durationSec": 4.0, "xp": 26, "output": { "shelter_progress": 2 },
+      "staminaCost": 3, "region": "north_beach", "riskEvents": []
+    },
+    "build_firepit": {
+      "skill": "construction", "tier": "T2", "unlockLevel": 5, "unlockRequires": [],
+      "durationSec": 4.0, "xp": 26, "output": { "firepit_progress": 2 },
+      "staminaCost": 2, "region": "north_beach", "riskEvents": []
+    }
+  },
+
+  "research": {
+    "study_manual_page": {
+      "skill": "research", "tier": "T3", "unlockLevel": 12, "unlockRequires": ["item:manual_page"],
+      "durationSec": 8.0, "xp": 62, "output": { "knowledge": 8 },
+      "consume": { "manual_page": 1 },
+      "staminaCost": 1, "region": "north_beach", "riskEvents": []
+    },
+    "study_instruction": {
+      "skill": "research", "tier": "T3", "unlockLevel": 12, "unlockRequires": ["item:instruction_label"],
+      "durationSec": 8.0, "xp": 62, "output": { "knowledge": 12 },
+      "consume": { "instruction_label": 1 },
+      "staminaCost": 1, "region": "north_beach", "riskEvents": []
+    },
+    "study_book": {
+      "skill": "research", "tier": "T4", "unlockLevel": 22, "unlockRequires": ["item:whole_book"],
+      "durationSec": 10.0, "xp": 145, "output": { "knowledge": 30 },
+      "consume": { "whole_book": 1 },
+      "staminaCost": 2, "region": "north_beach", "riskEvents": []
+    },
+    "study_blueprint": {
+      "skill": "research", "tier": "T4", "unlockLevel": 22, "unlockRequires": ["item:paper_blueprint"],
+      "durationSec": 10.0, "xp": 145, "output": { "knowledge": 50 },
+      "consume": { "paper_blueprint": 1 },
+      "staminaCost": 2, "region": "north_beach", "riskEvents": []
+    }
+  }
+}

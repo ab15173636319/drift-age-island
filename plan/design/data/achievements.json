@@ -1,0 +1,94 @@
+{
+  "// 说明": "6 大类 68 条成就。每类分阶段解锁，奖励为称号/心态/知识点",
+
+  "categories": {
+    "milestone": {
+      "name": "里程碑",
+      "icon": "flag",
+      "achievements": {
+        "first_fire": { "name": "第一堆火", "condition": "建成火塘", "reward": { "mood": 5, "title": "点火者" } },
+        "first_shelter": { "name": "第一间屋", "condition": "建成简易遮蔽", "reward": { "mood": 5, "title": "筑巢者" } },
+        "first_meal": { "name": "第一顿熟食", "condition": "烹饪出第一份熟食", "reward": { "mood": 3 } },
+        "rainwater_done": { "name": "水源", "condition": "建成雨水收集棚", "reward": { "mood": 10, "title": "引水人" } },
+        "storage_done": { "name": "仓库", "condition": "建成储物棚", "reward": { "mood": 5 } },
+        "watchtower_done": { "name": "瞭望", "condition": "建成瞭望塔", "reward": { "mood": 15, "title": "守望者" } },
+        "shipyard_done": { "name": "船坞", "condition": "建成船坞", "reward": { "mood": 20, "title": "造船师" } },
+        "solar_done": { "name": "电力", "condition": "建成太阳能充电板", "reward": { "mood": 15, "title": "发电者" } },
+        "radio_done": { "name": "电波", "condition": "建成无线电发射塔", "reward": { "mood": 15, "title": "电波人" } }
+      }
+    },
+
+    "skill": {
+      "name": "技能",
+      "icon": "star",
+      "achievements": {
+        "gathering_10": { "name": "采集学徒", "condition": "采集 Lv10", "reward": { "mood": 3 } },
+        "gathering_25": { "name": "采集熟手", "condition": "采集 Lv25", "reward": { "mood": 5 } },
+        "gathering_50": { "name": "采集专家", "condition": "采集 Lv50", "reward": { "mood": 10, "title": "采集大师" } },
+        "woodcutting_10": { "name": "伐木工", "condition": "伐木 Lv10", "reward": { "mood": 3 } },
+        "woodcutting_25": { "name": "伐木熟手", "condition": "伐木 Lv25", "reward": { "mood": 5 } },
+        "woodcutting_50": { "name": "伐木专家", "condition": "伐木 Lv50", "reward": { "mood": 10, "title": "伐木大师" } },
+        "all_skills_10": { "name": "勤勉", "condition": "任意 3 项技能 Lv20", "reward": { "parallelSlot": 1, "title": "勤勉" } },
+        "all_skills_40": { "name": "一人成军", "condition": "任意 6 项技能 Lv40", "reward": { "parallelSlot": 1, "title": "一人成军" } },
+        "all_skills_50": { "name": "全才", "condition": "全部 14 项技能 Lv50", "reward": { "mood": 20, "title": "全才" } }
+      }
+    },
+
+    "trash": {
+      "name": "拾荒",
+      "icon": "bottle",
+      "achievements": {
+        "first_trash": { "name": "第一件垃圾", "condition": "拾取第一件漂流物", "reward": { "mood": 3 } },
+        "trash_50": { "name": "拾荒新手", "condition": "累计拾取 50 件垃圾", "reward": { "mood": 5 } },
+        "trash_100": { "name": "拾荒熟手", "condition": "累计拾取 100 件垃圾", "reward": { "mood": 8 } },
+        "trash_200": { "name": "拾荒专家", "condition": "累计拾取 200 件垃圾", "reward": { "mood": 12, "title": "拾荒者" } },
+        "rare_10": { "name": "稀有发现", "condition": "拾取 10 件稀有垃圾", "reward": { "mood": 8 } },
+        "rare_30": { "name": "稀有收藏家", "condition": "拾取 30 件稀有垃圾", "reward": { "mood": 15, "title": "考古学家" } },
+        "key_all": { "name": "瓶中信", "condition": "集齐全部 8 种关键件", "reward": { "knowledge": 100, "title": "瓶中信" } },
+        "trash_100pct": { "name": "垃圾文明", "condition": "垃圾图鉴 100%", "reward": { "salvageMasteryBonus": 0.10, "title": "垃圾文明" } }
+      }
+    },
+
+    "battle": {
+      "name": "战斗",
+      "icon": "sword",
+      "achievements": {
+        "first_battle": { "name": "第一场战斗", "condition": "赢得第一场战斗", "reward": { "mood": 5 } },
+        "boss_thorn": { "name": "荆棘终结者", "condition": "击败荆棘守护者", "reward": { "mood": 15, "title": "破荆者" } },
+        "boar_kill": { "name": "野猪猎手", "condition": "击杀 10 头野猪", "reward": { "mood": 8 } },
+        "lizard_kill": { "name": "巨蜥克星", "condition": "击杀巨蜥", "reward": { "mood": 15, "title": "屠龙者" } },
+        "shark_kill": { "name": "鲨鱼猎手", "condition": "击杀鲨鱼", "reward": { "mood": 20, "title": "海王" } },
+        "battle_50": { "name": "身经百战", "condition": "累计赢得 50 场战斗", "reward": { "mood": 10 } },
+        "battle_100": { "name": "百战不殆", "condition": "累计赢得 100 场战斗", "reward": { "mood": 20, "title": "战神" } }
+      }
+    },
+
+    "narrative": {
+      "name": "叙事",
+      "icon": "book",
+      "achievements": {
+        "diary_10": { "name": "日记新手", "condition": "撰写 10 篇日记", "reward": { "mood": 5 } },
+        "diary_30": { "name": "日记熟手", "condition": "撰写 30 篇日记", "reward": { "mood": 10 } },
+        "diary_50": { "name": "日记专家", "condition": "撰写 50 篇日记", "reward": { "mood": 15, "title": "日记人" } },
+        "memory_5": { "name": "回忆碎片", "condition": "解锁 5 条回忆", "reward": { "mood": 10 } },
+        "memory_all": { "name": "完整的人", "condition": "解锁全部回忆", "reward": { "mood": 25, "title": "完整的人" } },
+        "bottle_10": { "name": "漂流瓶", "condition": "收集 10 个漂流瓶", "reward": { "mood": 8 } },
+        "bottle_all": { "name": "海边的人", "condition": "收集全部漂流瓶", "reward": { "mood": 20, "title": "海边的人" } },
+        "turtle_saved": { "name": "放生", "condition": "救助搁浅海龟", "reward": { "mood": 15, "title": "好心人" } }
+      }
+    },
+
+    "ending": {
+      "name": "结局",
+      "icon": "flag",
+      "achievements": {
+        "ending_voyage": { "name": "归航", "condition": "达成结局 A", "reward": { "title": "归航者" } },
+        "ending_settle": { "name": "长居", "condition": "达成结局 B", "reward": { "title": "长居者" } },
+        "ending_broadcast": { "name": "失联", "condition": "达成结局 C", "reward": { "title": "守塔人" } },
+        "ending_all": { "name": "三个人生", "condition": "达成全部 3 个结局", "reward": { "title": "三个人生" } }
+      }
+    }
+  },
+
+  "totalCount": 68
+}

@@ -1,0 +1,108 @@
+{
+  "// 说明": "7 类敌人 + 2 个 Boss。战斗为自动回合制，玩家只配装与选策略",
+
+  "enemies": {
+    "crab": {
+      "name": "螃蟹",
+      "hp": 20, "attack": 5, "defense": 3,
+      "accuracy": 0.8, "evasion": 0.1,
+      "region": "east_reef",
+      "level": 1,
+      "drops": { "crab_meat": 1, "shell": 1 },
+      "exp": 15,
+      "description": "新手教学战，必胜"
+    },
+    "snake": {
+      "name": "野蛇",
+      "hp": 35, "attack": 12, "defense": 2,
+      "accuracy": 0.7, "evasion": 0.25,
+      "region": "thorn_belt",
+      "level": 5,
+      "drops": { "snake_meat": 1, "snake_skin": 1 },
+      "exp": 30,
+      "poisonChance": 0.3,
+      "description": "可能失败，教撤退机制"
+    },
+    "boar": {
+      "name": "野猪",
+      "hp": 80, "attack": 20, "defense": 8,
+      "accuracy": 0.85, "evasion": 0.1,
+      "region": "outer_forest",
+      "level": 10,
+      "drops": { "raw_meat": 3, "leather": 2, "tusk": 1 },
+      "exp": 60,
+      "description": "高攻，需要藤甲"
+    },
+    "monitor_lizard": {
+      "name": "巨蜥",
+      "hp": 150, "attack": 30, "defense": 15,
+      "accuracy": 0.8, "evasion": 0.15,
+      "region": "deep_forest",
+      "level": 20,
+      "drops": { "raw_meat": 5, "leather": 3, "bone": 2 },
+      "exp": 120,
+      "description": "Boss 级，需要金属装备"
+    },
+    "shark": {
+      "name": "鲨鱼",
+      "hp": 200, "attack": 40, "defense": 10,
+      "accuracy": 0.9, "evasion": 0.2,
+      "region": "shipwreck",
+      "level": 25,
+      "drops": { "shark_meat": 8, "shark_teeth": 3 },
+      "exp": 200,
+      "description": "水中事件，限时"
+    },
+    "bat": {
+      "name": "蝙蝠群",
+      "hp": 15, "attack": 8, "defense": 1,
+      "accuracy": 0.9, "evasion": 0.3,
+      "region": "cave",
+      "level": 8,
+      "drops": { "guano": 1 },
+      "exp": 20,
+      "description": "山洞小怪"
+    },
+    "wasp_swarm": {
+      "name": "蜂群",
+      "hp": 50, "attack": 15, "defense": 0,
+      "accuracy": 0.95, "evasion": 0.4,
+      "region": "thorn_belt",
+      "level": 12,
+      "drops": { "honey": 1, "venom_sac": 1 },
+      "exp": 50,
+      "description": "荆棘守护者的一部分"
+    }
+  },
+
+  "bosses": {
+    "thorn_guardian": {
+      "name": "荆棘守护者",
+      "appearsAt": "第二章末",
+      "phases": [
+        { "enemy": "wasp_swarm", "count": 3 },
+        { "enemy": "boar", "count": 1 }
+      ],
+      "recommendedLevel": 15,
+      "reward": { "exp": 300, "item": "thorn_belt_key" },
+      "description": "其实是一群受惊的动物，和主角一样。击败后日记反转。"
+    },
+    "hurricane_aftermath": {
+      "name": "飓风余波",
+      "appearsAt": "终章",
+      "phases": [
+        { "enemy": "environmental_damage", "count": 20 }
+      ],
+      "turnLimit": 20,
+      "recommendedLevel": 50,
+      "reward": { "ending": "any" },
+      "description": "限时生存战，撑过 20 回合"
+    }
+  },
+
+  "// 战斗策略": {
+    "aggressive": "激进：攻击 +20%，防御 -10%",
+    "balanced": "均衡：无修正",
+    "defensive": "保守：防御 +20%，攻击 -10%"
+  }
+}

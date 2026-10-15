@@ -1,0 +1,165 @@
+{
+  "// 说明": "7 层科技树。每层需先解锁上一层。cost 为知识点消耗",
+
+  "layers": [
+    {
+      "layer": 1,
+      "name": "生存基础",
+      "cost": 30,
+      "nodes": {
+        "boil_water": {
+          "name": "煮沸消毒",
+          "cost": 10,
+          "effect": "淡水煮沸后疾病率 -30%"
+        },
+        "simple_trap": {
+          "name": "简易陷阱",
+          "cost": 10,
+          "effect": "解锁狩猎 T2（小型陷阱）"
+        },
+        "identify_plants": {
+          "name": "辨识可食植物",
+          "cost": 10,
+          "effect": "蘑菇中毒率 10% -> 3%"
+        }
+      }
+    },
+    {
+      "layer": 2,
+      "name": "淡水与食物",
+      "cost": 50,
+      "nodes": {
+        "distill_water": {
+          "name": "蒸馏淡水",
+          "cost": 20,
+          "effect": "解锁蒸馏器（海水 -> 淡水 +40/日）"
+        },
+        "food_preserve": {
+          "name": "食物保存",
+          "cost": 15,
+          "effect": "全部熟食保存期 ×1.5"
+        },
+        "trap_setup": {
+          "name": "陷阱布置（被动）",
+          "cost": 15,
+          "effect": "陷阱容量 +2，破坏率 -3%"
+        }
+      }
+    },
+    {
+      "layer": 3,
+      "name": "工具与材料",
+      "cost": 80,
+      "nodes": {
+        "metal_smelting": {
+          "name": "金属冶炼",
+          "cost": 30,
+          "effect": "铁矿砂 -> 金属（需锻造台）"
+        },
+        "rope_reinforce": {
+          "name": "绳索强化",
+          "cost": 25,
+          "effect": "解锁缆绳配方（渔线 + 绳索）"
+        },
+        "pottery_glaze": {
+          "name": "陶器釉料",
+          "cost": 25,
+          "effect": "陶罐容量 +50%，不碎裂率 +10%"
+        }
+      }
+    },
+    {
+      "layer": 4,
+      "name": "能源",
+      "cost": 120,
+      "nodes": {
+        "solar_power": {
+          "name": "太阳能利用",
+          "cost": 40,
+          "effect": "解锁太阳能充电板（手机永久供电）"
+        },
+        "charcoal_refine": {
+          "name": "木炭精炼",
+          "cost": 35,
+          "effect": "木炭产出 ×2，锻造效率 +20%"
+        },
+        "battery_repair": {
+          "name": "蓄电池修复",
+          "cost": 45,
+          "effect": "蓄电池可重复使用（信号发射器前置）"
+        }
+      }
+    },
+    {
+      "layer": 5,
+      "name": "通信",
+      "cost": 170,
+      "nodes": {
+        "radio_principle": {
+          "name": "无线电原理",
+          "cost": 60,
+          "effect": "解锁信号发射器组装（结局 A/C 前置）"
+        },
+        "antenna_setup": {
+          "name": "天线架设",
+          "cost": 50,
+          "effect": "瞭望塔垃圾刷新额外 +10%"
+        },
+        "morse_code": {
+          "name": "摩尔斯电码",
+          "cost": 60,
+          "effect": "解锁结局 C 的广播小游戏"
+        }
+      }
+    },
+    {
+      "layer": 6,
+      "name": "远航",
+      "cost": 230,
+      "nodes": {
+        "hull_design": {
+          "name": "船体设计",
+          "cost": 80,
+          "effect": "解锁船坞建造（结局 A 前置）"
+        },
+        "navigation": {
+          "name": "导航术",
+          "cost": 70,
+          "effect": "校准指南针生效，远洋不迷航"
+        },
+        "waterproof_craft": {
+          "name": "防水工艺",
+          "cost": 80,
+          "effect": "筏子/船体抗风暴等级 +1"
+        }
+      }
+    },
+    {
+      "layer": 7,
+      "name": "归航 / 长居",
+      "cost": 300,
+      "nodes": {
+        "ocean_voyage": {
+          "name": "远洋航行",
+          "cost": 100,
+          "effect": "船坞完工，可启航",
+          "ending": "voyage"
+        },
+        "home_building": {
+          "name": "家园营造",
+          "cost": 100,
+          "effect": "全建筑满级，岛即家园",
+          "ending": "settle"
+        },
+        "eternal_broadcast": {
+          "name": "永恒广播",
+          "cost": 100,
+          "effect": "无线电持续发送，选择留下",
+          "ending": "broadcast"
+        }
+      }
+    }
+  ],
+
+  "// 结局说明": "第七层三个节点互斥，选一个即锁定结局路线（可在最终确认前改选）"
+}

@@ -1,0 +1,212 @@
+{
+  "// 说明": "14 座建筑的成本、效果、解锁条件。baseLevel 为建筑等级，营地总等级 = 所有建筑等级之和",
+
+  "shelter": {
+    "name": "简易遮蔽",
+    "maxLevel": 5,
+    "unlockLevel": 1,
+    "cost": [
+      { "level": 1, "materials": { "branch": 20, "leaves": 30 } },
+      { "level": 2, "materials": { "wood": 50, "leaves": 60 } },
+      { "level": 3, "materials": { "wood": 120, "vine": 30 } },
+      { "level": 4, "materials": { "hardwood": 80, "vine": 60 } },
+      { "level": 5, "materials": { "hardwood": 200, "metal": 30 } }
+    ],
+    "effects": {
+      "offlineCapBonus": 2,
+      "weatherImmunity": ["night_cold"],
+      "moodPerDay": 1
+    },
+    "description": "离线上限 +2h，夜间失温免疫"
+  },
+
+  "firepit": {
+    "name": "火塘",
+    "maxLevel": 3,
+    "unlockLevel": 1,
+    "cost": [
+      { "level": 1, "materials": { "stone": 15, "wood": 20 } },
+      { "level": 2, "materials": { "stone": 30, "wood": 40 } },
+      { "level": 3, "materials": { "stone": 50, "charcoal": 20 } }
+    ],
+    "effects": {
+      "cookingEfficiency": 0.2,
+      "beastRepellent": true,
+      "moodPerDay": 2
+    },
+    "description": "烹饪效率 +20%，驱兽，每日心态 +2"
+  },
+
+  "rainwater_shelter": {
+    "name": "雨水收集棚",
+    "maxLevel": 3,
+    "unlockLevel": 1,
+    "cost": [
+      { "level": 1, "materials": { "waterproof_cloth": 1, "bamboo": 30, "vine": 20 } },
+      { "level": 2, "materials": { "waterproof_cloth": 2, "bamboo": 60, "vine": 40 } },
+      { "level": 3, "materials": { "waterproof_cloth": 3, "bamboo": 100, "vine": 60 } }
+    ],
+    "effects": {
+      "waterPerDay": [20, 40, 60],
+      "offlineWaterAuto": true
+    },
+    "description": "每日自动产水 20/40/60，离线自动补水"
+  },
+
+  "storage": {
+    "name": "储物棚",
+    "maxLevel": 3,
+    "unlockLevel": 1,
+    "cost": [
+      { "level": 1, "materials": { "wood": 40, "vine": 20 } },
+      { "level": 2, "materials": { "wood": 80, "vine": 40 } },
+      { "level": 3, "materials": { "hardwood": 60, "vine": 60 } }
+    ],
+    "effects": {
+      "inventoryCapacity": [2000, 5000, 10000]
+    },
+    "description": "背包容量 2000/5000/10000"
+  },
+
+  "smokehouse": {
+    "name": "熏制架",
+    "maxLevel": 2,
+    "unlockLevel": 1,
+    "cost": [
+      { "level": 1, "materials": { "wood": 50, "salt": 10 } },
+      { "level": 2, "materials": { "hardwood": 40, "salt": 20 } }
+    ],
+    "effects": {
+      "foodPreserveMultiplier": [3, 5]
+    },
+    "description": "食物保存期 ×3 / ×5"
+  },
+
+  "herb_garden": {
+    "name": "药圃",
+    "maxLevel": 2,
+    "unlockLevel": 1,
+    "cost": [
+      { "level": 1, "materials": { "soil": 20, "seed": 10 } },
+      { "level": 2, "materials": { "soil": 40, "seed": 20, "fertilizer": 10 } }
+    ],
+    "effects": {
+      "herbPerDay": [3, 8]
+    },
+    "description": "每日自动产药材 3/8"
+  },
+
+  "workbench": {
+    "name": "工作台/锻造台",
+    "maxLevel": 2,
+    "unlockLevel": 1,
+    "cost": [
+      { "level": 1, "materials": { "stone": 30, "wood": 60 } },
+      { "level": 2, "materials": { "stone": 60, "metal": 20, "hardwood": 40 } }
+    ],
+    "effects": {
+      "craftingUnlocks": ["metal_tool", "metal_armor"],
+      "smithingEfficiency": [0, 0.3]
+    },
+    "description": "解锁高级制作，锻造效率 +30%"
+  },
+
+  "watchtower": {
+    "name": "瞭望塔",
+    "maxLevel": 1,
+    "unlockLevel": 1,
+    "cost": [
+      { "level": 1, "materials": { "hardwood": 1200, "rope": 200 } }
+    ],
+    "effects": {
+      "trashSpawnBonus": 0.20,
+      "unlockRegion": "highland"
+    },
+    "description": "全岛垃圾刷新 +20%，解锁高地"
+  },
+
+  "shipyard": {
+    "name": "船坞",
+    "maxLevel": 1,
+    "unlockLevel": 1,
+    "cost": [
+      { "level": 1, "materials": { "hardwood": 80000, "metal": 5000, "rope": 3000 } }
+    ],
+    "effects": {
+      "endingUnlock": "voyage"
+    },
+    "description": "结局 A 归航主线"
+  },
+
+  "pottery_kiln": {
+    "name": "陶窑",
+    "maxLevel": 2,
+    "unlockLevel": 1,
+    "cost": [
+      { "level": 1, "materials": { "clay": 30, "stone": 20 } },
+      { "level": 2, "materials": { "clay": 60, "charcoal": 30 } }
+    ],
+    "effects": {
+      "potteryEfficiency": [0.5, 1.0]
+    },
+    "description": "陶器制作效率 +50% / +100%"
+  },
+
+  "distiller": {
+    "name": "蒸馏器",
+    "maxLevel": 1,
+    "unlockLevel": 1,
+    "cost": [
+      { "level": 1, "materials": { "glass": 5, "metal": 10, "pipe": 3 } }
+    ],
+    "effects": {
+      "saltwaterToFresh": 40
+    },
+    "description": "海水蒸馏每日 +40 淡水（科技树第二层解锁）"
+  },
+
+  "solar_panel": {
+    "name": "太阳能充电板",
+    "maxLevel": 1,
+    "unlockLevel": 1,
+    "cost": [
+      { "level": 1, "materials": { "solar_shard": 1, "metal": 20, "wire": 10 } }
+    ],
+    "effects": {
+      "phonePermanentPower": true
+    },
+    "description": "手机永久供电，解锁全部手机剧情（科技树第四层）"
+  },
+
+  "radio_tower": {
+    "name": "无线电发射塔",
+    "maxLevel": 1,
+    "unlockLevel": 1,
+    "cost": [
+      { "level": 1, "materials": { "radio_module": 1, "battery": 1, "copper_coil": 1, "hardwood": 500 } }
+    ],
+    "effects": {
+      "endingUnlock": "broadcast",
+      "signalRange": "world"
+    },
+    "description": "结局 C 失联主线（科技树第五层）"
+  },
+
+  "home_hall": {
+    "name": "家园厅堂",
+    "maxLevel": 5,
+    "unlockLevel": 1,
+    "cost": [
+      { "level": 1, "materials": { "hardwood": 500, "cloth": 20 } },
+      { "level": 2, "materials": { "hardwood": 1000, "cloth": 40 } },
+      { "level": 3, "materials": { "hardwood": 2000, "cloth": 80, "glass": 10 } },
+      { "level": 4, "materials": { "hardwood": 4000, "cloth": 160, "glass": 20 } },
+      { "level": 5, "materials": { "hardwood": 8000, "cloth": 320, "glass": 40, "metal": 500 } }
+    ],
+    "effects": {
+      "moodMaxBonus": [5, 10, 15, 20, 25],
+      "endingUnlock": "settle"
+    },
+    "description": "心态上限 +5/10/15/20/25，结局 B 长居主线"
+  }
+}
