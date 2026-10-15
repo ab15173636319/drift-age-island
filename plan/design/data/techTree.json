@@ -5,8 +5,13 @@
     {
       "layer": 1,
       "name": "生存基础",
-      "cost": 30,
+      "cost": 35,
       "nodes": {
+        "clock": {
+          "name": "时钟",
+          "cost": 5,
+          "effect": "解锁精确时间显示，从日出/中午/下午/日落/晚上变为具体时刻"
+        },
         "boil_water": {
           "name": "煮沸消毒",
           "cost": 10,

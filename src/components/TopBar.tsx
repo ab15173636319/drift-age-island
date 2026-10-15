@@ -1,12 +1,14 @@
 import { useGame } from "../game/store";
 import { baseLevel, offlineCapHours, weatherName } from "../game/core";
-import { formatClock } from "./ui";
+import { formatGameTime, getTimeOfDayInfo } from "../game/time";
 
 export function TopBar() {
   const game = useGame((state) => state.game);
   const now = useGame((state) => state.now);
   const openModal = useGame((state) => state.openModal);
   const resetGame = useGame((state) => state.resetGame);
+  const clockUnlocked = game.tech.unlockedNodes.includes("clock");
+  const time = getTimeOfDayInfo(now);
 
   return (
     <header className="topbar">
@@ -17,7 +19,17 @@ export function TopBar() {
 
       <div className="topbar-stats">
         <span className="topbar-chip">第 {game.day} 天</span>
-        <span className="topbar-chip">🕐 {formatClock(now)}</span>
+        <span className="topbar-chip">
+          {clockUnlocked ? (
+            <>
+              🕐 {formatGameTime(now)} · {time.icon} {time.label}
+            </>
+          ) : (
+            <>
+              {time.icon} {time.label}
+            </>
+          )}
+        </span>
         <span className="topbar-chip">☁️ {weatherName(game.weather.today)}</span>
         <span className="topbar-chip">📖 第 {game.chapter} 章</span>
         <span className="topbar-chip">😌 {Math.round(game.player.mood)}%</span>

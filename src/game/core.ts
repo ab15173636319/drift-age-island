@@ -10,6 +10,7 @@ import {
   TECH_LAYERS,
   label,
 } from "./staticData";
+import { getTimeOfDayInfo } from "./time";
 import type {
   ActionDefinition,
   ActionSlot,
@@ -261,8 +262,8 @@ export function wakeFromSleep(state: GameState, wakeAt: number, logs: LogEntry[]
   };
   for (const slot of state.actionSlots) {
     if (slot.pauseReason === "沉睡中" || slot.pauseReason === "小憩中") {
-      slot.paused = false;
-      slot.pauseReason = null;
+      slot.paused = true;
+      slot.pauseReason = "睡眠结束，点击恢复";
       slot.lastSettledAt = wakeAt;
     }
   }
@@ -443,9 +444,9 @@ export function availableActionsForSkill(state: GameState, skill: SkillId): Acti
 
 export function computeEfficiency(state: GameState, action: ActionDefinition): number {
   let efficiency = 1;
-  const hour = new Date().getHours();
-  const isNight = hour >= 20 || hour < 6;
-  const isNoon = hour >= 11 && hour < 15;
+  const time = getTimeOfDayInfo(Date.now());
+  const isNight = time.period === "night";
+  const isNoon = time.period === "noon";
 
   if (isNight && (action.skill === "woodcutting" || action.skill === "mining")) efficiency *= 0.6;
   if (isNight && action.skill === "hunting") efficiency *= 1.2;
