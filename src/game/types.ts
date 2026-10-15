@@ -143,6 +143,7 @@ export interface PlayerState {
   thirst: number;
   stamina: number;
   staminaMax: number;
+  fatigue: number;
   mood: number;
   moodMax: number;
   hp: number;
@@ -152,6 +153,14 @@ export interface PlayerState {
     weapon: string;
     armor: string;
   };
+}
+
+export interface SleepState {
+  active: boolean;
+  type: "deep" | "nap" | null;
+  startedAt: number;
+  endsAt: number;
+  lastProcessedAt: number;
 }
 
 export interface DiaryEntry {
@@ -192,6 +201,7 @@ export interface GameState {
   keyItemPity: number;
   rarePityNewbie: number;
   player: PlayerState;
+  sleep: SleepState;
   weather: WeatherState;
   stats: {
     totalPlaySec: number;
