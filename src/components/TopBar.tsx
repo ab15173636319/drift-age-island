@@ -1,14 +1,13 @@
 import { useGame } from "../game/store";
 import { baseLevel, offlineCapHours, weatherName } from "../game/core";
-import { formatGameTime, getTimeOfDayInfo } from "../game/time";
+import { formatGameMinutes, getGameTimeOfDayInfo } from "../game/time";
 
 export function TopBar() {
   const game = useGame((state) => state.game);
-  const now = useGame((state) => state.now);
   const openModal = useGame((state) => state.openModal);
   const resetGame = useGame((state) => state.resetGame);
   const clockUnlocked = game.tech.unlockedNodes.includes("clock");
-  const time = getTimeOfDayInfo(now);
+  const time = getGameTimeOfDayInfo(game.gameTimeMinutes);
 
   return (
     <header className="topbar">
@@ -22,7 +21,7 @@ export function TopBar() {
         <span className="topbar-chip">
           {clockUnlocked ? (
             <>
-              🕐 {formatGameTime(now)} · {time.icon} {time.label}
+              🕐 {formatGameMinutes(game.gameTimeMinutes)} · {time.icon} {time.label}
             </>
           ) : (
             <>

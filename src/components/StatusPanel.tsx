@@ -97,7 +97,7 @@ export function StatusPanel() {
               <button className="ghost-button small" onClick={() => startNap(napMinutes)}>
                 🪑 小憩
               </button>
-              <span className="muted">分钟</span>
+              <span className="muted">游戏分钟</span>
             </div>
           </>
         )}

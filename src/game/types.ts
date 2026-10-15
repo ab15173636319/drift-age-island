@@ -161,6 +161,7 @@ export interface SleepState {
   startedAt: number;
   endsAt: number;
   lastProcessedAt: number;
+  gameMinutes: number;
 }
 
 export interface DiaryEntry {
@@ -182,6 +183,7 @@ export interface GameState {
   lastSettleAt: number;
   lastSurvivalAt: number;
   lastDayKey: string;
+  gameTimeMinutes: number;
   day: number;
   chapter: number;
   prologueDone: boolean;

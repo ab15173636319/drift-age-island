@@ -8,6 +8,43 @@ export interface TimeOfDayInfo {
   icon: string;
 }
 
+export function getGameTimeOfDayInfo(gameTimeMinutes: number): TimeOfDayInfo {
+  const totalMinutes = Math.floor(Math.max(0, gameTimeMinutes));
+  const minuteOfDay = totalMinutes % (24 * 60);
+  const hour = Math.floor(minuteOfDay / 60);
+  const minute = minuteOfDay % 60;
+  let period: TimePeriod;
+
+  if (hour >= 6 && hour < 10) period = "sunrise";
+  else if (hour >= 10 && hour < 14) period = "noon";
+  else if (hour >= 14 && hour < 18) period = "afternoon";
+  else if (hour >= 18 && hour < 21) period = "sunset";
+  else period = "night";
+
+  const labels: Record<TimePeriod, string> = {
+    sunrise: "日出",
+    noon: "中午",
+    afternoon: "下午",
+    sunset: "日落",
+    night: "晚上",
+  };
+  const icons: Record<TimePeriod, string> = {
+    sunrise: "🌅",
+    noon: "☀️",
+    afternoon: "🌤️",
+    sunset: "🌇",
+    night: "🌙",
+  };
+
+  return {
+    hour,
+    minute,
+    period,
+    label: labels[period],
+    icon: icons[period],
+  };
+}
+
 export function getTimeOfDayInfo(timestamp: number): TimeOfDayInfo {
   const date = new Date(timestamp);
   const hour = date.getHours();
@@ -50,4 +87,11 @@ export function formatGameTime(timestamp: number): string {
     minute: "2-digit",
     hour12: false,
   }).format(timestamp);
+}
+
+export function formatGameMinutes(gameTimeMinutes: number): string {
+  const minuteOfDay = Math.floor(Math.max(0, gameTimeMinutes)) % (24 * 60);
+  const hour = Math.floor(minuteOfDay / 60);
+  const minute = minuteOfDay % 60;
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 }

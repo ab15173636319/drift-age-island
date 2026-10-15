@@ -20,6 +20,9 @@ function ActionRow({
   const level = game.skills[action.skill].level;
   const unlocked = level >= action.unlockLevel;
   const canRun = unlocked && (!action.consume || hasItems(game, action.consume));
+  const isRunning = game.actionSlots.some(
+    (slot) => slot.actionId === action.id && !slot.paused,
+  );
   const outputs = Object.entries(action.output)
     .filter(([id]) => id !== "knowledge")
     .map(([id, amount]) => `${label(id)}×${amount}`)
@@ -39,7 +42,9 @@ function ActionRow({
           {action.generated && <span className="action-badge muted">训练</span>}
         </div>
         <div className="action-numbers">
-          <span>{formatDuration(action.durationSec)}</span>
+          <span>
+            {Math.round(action.durationSec)} 分钟 · {formatDuration(action.durationSec)}
+          </span>
           <span>+{formatNumber(action.xp)} XP</span>
           {outputs && <span>{outputs}</span>}
         </div>
@@ -48,10 +53,10 @@ function ActionRow({
         <span className="muted">消耗：{inputs}</span>
         <button
           className="primary-button small"
-          disabled={!canRun}
+          disabled={!canRun || isRunning}
           onClick={() => onStart(action.id)}
         >
-          {unlocked ? "开始" : `Lv${action.unlockLevel} 解锁`}
+          {isRunning ? "运行中" : unlocked ? "开始" : `Lv${action.unlockLevel} 解锁`}
         </button>
       </div>
     </div>

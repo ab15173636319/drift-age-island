@@ -46,6 +46,34 @@ const actionNames: Record<string, string> = {
   study_blueprint: "解析纸质图纸",
 };
 
+const actionDurationMinutes: Record<string, number> = {
+  pick_berries: 30,
+  gather_nuts: 35,
+  dig_root: 40,
+  collect_seed_soil: 45,
+  outer_forest_gather: 50,
+  rare_herb_search: 60,
+  deep_mushroom: 70,
+  master_gather: 90,
+  pickup_branch: 20,
+  collect_leaves: 20,
+  chop_softwood: 45,
+  gather_vine: 40,
+  chop_bamboo: 45,
+  chop_hardwood: 60,
+  deep_hardwood: 75,
+  master_woodcut: 90,
+  start_fire: 20,
+  cook_berry: 10,
+  make_charcoal: 30,
+  build_shelter: 120,
+  build_firepit: 120,
+  study_manual_page: 60,
+  study_instruction: 60,
+  study_book: 90,
+  study_blueprint: 120,
+};
+
 export const ACTIONS: Record<string, ActionDefinition> = {};
 export const ACTIONS_BY_SKILL: Record<SkillId, ActionDefinition[]> = Object.fromEntries(
   SKILL_IDS.map((id) => [id, []]),
@@ -62,6 +90,7 @@ for (const [skillId, actions] of Object.entries(actionGroups)) {
       name: actionNames[actionId] ?? prettifyId(actionId),
       ...(raw as Omit<ActionDefinition, "id" | "name">),
       skill: normalizedSkill,
+      durationSec: actionDurationMinutes[actionId] ?? raw.durationSec,
     };
     ACTIONS[actionId] = action;
     ACTIONS_BY_SKILL[normalizedSkill]?.push(action);

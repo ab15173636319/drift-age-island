@@ -10,7 +10,7 @@ import {
   TECH_LAYERS,
   label,
 } from "./staticData";
-import { getTimeOfDayInfo } from "./time";
+import { getGameTimeOfDayInfo } from "./time";
 import type {
   ActionDefinition,
   ActionSlot,
@@ -177,7 +177,7 @@ export function makeTrainingAction(skill: SkillId): ActionDefinition {
     tier,
     unlockLevel: 1,
     unlockRequires: [],
-    durationSec: 4,
+    durationSec: 30,
     xp: base.xp,
     output: {},
     staminaCost: 0,
@@ -210,7 +210,54 @@ export function survivalReduction(state: GameState): number {
 }
 
 export function offlineCapHours(state: GameState): number {
-  return Math.max(2, Math.min(24, baseLevel(state) + 1));
+  return Math.max(8, Math.min(24, baseLevel(state) + 1));
+}
+
+export const GAME_MINUTES_PER_DAY = 24 * 60;
+
+export function applySurvivalForGameMinutes(
+  state: GameState,
+  gameMinutes: number,
+  logs: LogEntry[],
+): void {
+  if (gameMinutes <= 0) return;
+  const hours = gameMinutes / 60;
+  const reduction = survivalReduction(state);
+  const waterLoss = 4 * (1 - reduction) * hours;
+  const foodLoss = 3 * (1 - reduction) * hours;
+  state.player.thirst = clamp(state.player.thirst - waterLoss, 0, 100);
+  state.player.hunger = clamp(state.player.hunger - foodLoss, 0, 100);
+  void logs;
+}
+
+export function startNewGameDay(state: GameState, logs: LogEntry[]): void {
+  state.weather.today = rollWeather();
+  state.weather.forecast = rollNextForecast();
+  state.weather.stormCountdown = Math.max(0, state.weather.stormCountdown - 1);
+  state.weather.stormWarning = state.weather.stormCountdown <= 1;
+  cleanOldTrash(state);
+  applyDailyAutomaticProduction(state, logs);
+  if (state.day % 4 === 0) {
+    spawnDailyTrash(state, logs);
+  }
+  unlockRegions(state);
+  logs.push(createLog(`—— 第 ${state.day} 天 · ${weatherName(state.weather.today)} ——`, "system"));
+}
+
+export function advanceGameTime(
+  state: GameState,
+  gameMinutes: number,
+  logs: LogEntry[],
+): void {
+  if (!Number.isFinite(gameMinutes) || gameMinutes <= 0) return;
+  const beforeDay = Math.floor(state.gameTimeMinutes / GAME_MINUTES_PER_DAY) + 1;
+  state.gameTimeMinutes += gameMinutes;
+  const afterDay = Math.floor(state.gameTimeMinutes / GAME_MINUTES_PER_DAY) + 1;
+  applySurvivalForGameMinutes(state, gameMinutes, logs);
+  for (let day = beforeDay + 1; day <= afterDay; day += 1) {
+    state.day = day;
+    startNewGameDay(state, logs);
+  }
 }
 
 export function clamp(value: number, min: number, max: number): number {
@@ -218,12 +265,12 @@ export function clamp(value: number, min: number, max: number): number {
 }
 
 export function deepSleepDuration(fatigue: number): number {
-  const hours = 5 + (100 - clamp(fatigue, 0, 100)) / 16;
-  return Math.round(hours * 3600);
+  void fatigue;
+  return 8 * 60;
 }
 
 export function fatigueRecoveryPerSec(type: "deep" | "nap"): number {
-  return type === "deep" ? 12 / 3600 : 8 / 3600;
+  return type === "deep" ? 0.2 : 0.15;
 }
 
 export function startSleep(
@@ -240,6 +287,7 @@ export function startSleep(
     startedAt: now,
     endsAt: now + durationSec * 1000,
     lastProcessedAt: now,
+    gameMinutes: durationSec,
   };
   const reason = type === "deep" ? "沉睡中" : "小憩中";
   for (const slot of state.actionSlots) {
@@ -253,13 +301,16 @@ export function startSleep(
 
 export function wakeFromSleep(state: GameState, wakeAt: number, logs: LogEntry[]): void {
   const type = state.sleep.type;
+  const gameMinutes = state.sleep.gameMinutes ?? 0;
   state.sleep = {
     active: false,
     type: null,
     startedAt: wakeAt,
     endsAt: wakeAt,
     lastProcessedAt: wakeAt,
+    gameMinutes: 0,
   };
+  advanceGameTime(state, gameMinutes, logs);
   for (const slot of state.actionSlots) {
     if (slot.pauseReason === "沉睡中" || slot.pauseReason === "小憩中") {
       slot.paused = true;
@@ -268,6 +319,10 @@ export function wakeFromSleep(state: GameState, wakeAt: number, logs: LogEntry[]
     }
   }
   logs.push(createLog(type === "deep" ? "你从沉睡中醒来。" : "小憩结束，精神恢复了一些。", "info"));
+  if (type === "deep") {
+    state.player.fatigue = 100;
+    state.player.stamina = state.player.staminaMax;
+  }
 }
 
 export function processSleep(
@@ -288,7 +343,7 @@ export function processSleep(
       100,
     );
     state.player.stamina = clamp(
-      state.player.stamina + elapsed * (8 / 3600),
+      state.player.stamina + elapsed * 0.15,
       0,
       state.player.staminaMax,
     );
@@ -444,7 +499,7 @@ export function availableActionsForSkill(state: GameState, skill: SkillId): Acti
 
 export function computeEfficiency(state: GameState, action: ActionDefinition): number {
   let efficiency = 1;
-  const time = getTimeOfDayInfo(Date.now());
+  const time = getGameTimeOfDayInfo(state.gameTimeMinutes);
   const isNight = time.period === "night";
   const isNoon = time.period === "noon";
 
@@ -560,7 +615,7 @@ export function trashSpawnMultiplier(state: GameState): number {
 }
 
 export function spawnDailyTrash(state: GameState, logs: LogEntry[]): void {
-  const baseCount = 3 + Math.floor(Math.random() * 6);
+  const baseCount = 1 + Math.floor(Math.random() * 2);
   const count = Math.max(1, Math.round(baseCount * trashSpawnMultiplier(state)));
   const regions = Object.entries(state.regions)
     .filter(([, region]) => region.unlocked)
@@ -634,19 +689,6 @@ export function rollNextForecast(): string[] {
   return [rollWeather(), rollWeather(), rollWeather()];
 }
 
-export function processNewDay(state: GameState, logs: LogEntry[]): void {
-  state.day += 1;
-  state.weather.today = rollWeather();
-  state.weather.forecast = rollNextForecast();
-  state.weather.stormCountdown = Math.max(0, state.weather.stormCountdown - 1);
-  state.weather.stormWarning = state.weather.stormCountdown <= 1;
-  cleanOldTrash(state);
-  applyDailyAutomaticProduction(state, logs);
-  spawnDailyTrash(state, logs);
-  unlockRegions(state);
-  logs.push(createLog(`—— 第 ${state.day} 天 · ${weatherName(state.weather.today)} ——`, "system"));
-}
-
 export function settleActionSlot(
   state: GameState,
   slot: ActionSlot,
@@ -692,7 +734,20 @@ export function settleActionSlot(
       }
     }
     addXp(state, action.skill, action.xp, logs);
+    advanceGameTime(state, action.durationSec, logs);
     reduceFatigueForAction(state, action);
+    if (state.player.thirst <= 0) {
+      slot.paused = true;
+      slot.pauseReason = "缺水";
+      completed += 1;
+      break;
+    }
+    if (state.player.hunger <= 0) {
+      slot.paused = true;
+      slot.pauseReason = "饥饿";
+      completed += 1;
+      break;
+    }
     if (allowFaint && maybeFaintFromFatigue(state, logs)) {
       slot.paused = true;
       slot.pauseReason = "沉睡中";
@@ -757,8 +812,9 @@ export function eatBestFood(state: GameState, logs: LogEntry[]): boolean {
   state.inventory[id] = (state.inventory[id] ?? 0) - 1;
   if (state.inventory[id] <= 0) delete state.inventory[id];
   const value = FOOD_VALUES[id] ?? 8;
+  advanceGameTime(state, 10, logs);
   state.player.hunger = Math.min(100, state.player.hunger + value);
-  logs.push(createLog(`吃下 ${label(id)}，饱食 +${value}`, "info"));
+  logs.push(createLog(`吃下 ${label(id)}，花费 10 分钟，饱食 +${value}`, "info"));
   return true;
 }
 
@@ -769,8 +825,9 @@ export function drinkWater(state: GameState, logs: LogEntry[]): boolean {
   }
   state.inventory.water -= 1;
   if (state.inventory.water <= 0) delete state.inventory.water;
+  advanceGameTime(state, 5, logs);
   state.player.thirst = Math.min(100, state.player.thirst + 10);
-  logs.push(createLog("饮水，水分 +10", "info"));
+  logs.push(createLog("饮水，花费 5 分钟，水分 +10", "info"));
   return true;
 }
 
@@ -856,36 +913,23 @@ export function consumeFoodUnits(state: GameState, units: number): void {
 }
 
 export function advanceDays(state: GameState, days: number, logs: LogEntry[]): void {
-  for (let i = 0; i < days; i += 1) {
-    processNewDay(state, logs);
-  }
+  advanceGameTime(state, days * GAME_MINUTES_PER_DAY, logs);
 }
 
 export function advanceGameOnline(state: GameState, now: number): { state: GameState; logs: LogEntry[] } {
   if (now <= state.lastSettleAt) return { state, logs: [] };
   const next = cloneState(state);
   const logs: LogEntry[] = [];
-  const survivalElapsed = Math.max(0, (now - next.lastSurvivalAt) / 1000);
 
   if (next.sleep.active) {
     processSleep(next, next.sleep.lastProcessedAt, now, logs);
   } else {
     settleSlotsOnline(next, now, logs);
   }
-  applySurvivalOnline(next, survivalElapsed, logs);
-
-  const key = dayKey(now);
-  if (key !== next.lastDayKey) {
-    const start = new Date(next.lastDayKey);
-    const end = new Date(key);
-    const days = Math.max(0, Math.round((end.getTime() - start.getTime()) / 86400000));
-    advanceDays(next, Math.min(days, 60), logs);
-    next.lastDayKey = key;
-  }
 
   next.lastSettleAt = now;
   next.lastSurvivalAt = now;
-  next.stats.totalPlaySec += survivalElapsed;
+  next.stats.totalPlaySec += Math.max(0, (now - state.lastSettleAt) / 1000);
   checkAchievements(next, logs);
   return { state: next, logs };
 }
@@ -914,15 +958,9 @@ export function settleOffline(
     processSleep(next, next.sleep.lastProcessedAt, processEnd, logs);
     remainingTaskSec = Math.max(0, (settleTo - processEnd) / 1000);
   }
-  const survival = simulateOfflineSurvival(next, cappedSec);
   const actionFactor = 0.6;
-  settleSlotsForDuration(next, Math.min(remainingTaskSec, survival.effectiveSec), actionFactor, logs);
+  settleSlotsForDuration(next, remainingTaskSec, actionFactor, logs);
 
-  const startDate = new Date(next.lastSettleAt);
-  const endDate = new Date(now);
-  const days = Math.max(0, Math.round((endDate.getTime() - startDate.getTime()) / 86400000));
-  advanceDays(next, Math.min(days, 60), logs);
-  next.lastDayKey = dayKey(now);
   next.lastSettleAt = now;
   next.lastSurvivalAt = now;
   next.stats.totalOfflineSec += cappedSec;
@@ -930,10 +968,10 @@ export function settleOffline(
 
   const report: OfflineReport = {
     elapsedSec,
-    effectiveSec: survival.effectiveSec,
+    effectiveSec: remainingTaskSec,
     capHours,
-    haltedReason: survival.reason,
-    haltedAtSec: survival.haltedAtSec,
+    haltedReason: null,
+    haltedAtSec: null,
     perSlot: next.actionSlots
       .filter((slot) => slot.actionId)
       .map((slot) => {
@@ -1029,7 +1067,8 @@ export function craftRecipe(
   removeItems(state, recipe.input);
   addItems(state, recipe.output);
   addXp(state, recipe.skill, recipe.xp, logs);
-  logs.push(createLog(`制作完成：${recipe.name}`, "gain"));
+  advanceGameTime(state, recipe.durationSec, logs);
+  logs.push(createLog(`制作完成：${recipe.name}，花费 ${recipe.durationSec} 分钟`, "gain"));
   checkAchievements(state, logs);
   return true;
 }
@@ -1056,6 +1095,7 @@ export function buildBuilding(
   state.buildings[buildingId] = currentLevel + 1;
   state.player.mood = Math.min(state.player.moodMax, state.player.mood + 8);
   addXp(state, "construction", 40 + currentLevel * 30, logs);
+  advanceGameTime(state, 120, logs);
   logs.push(createLog(`建造完成：${building.name} Lv${currentLevel + 1}`, "gain"));
   unlockRegions(state);
   checkAchievements(state, logs);
@@ -1140,6 +1180,7 @@ export function newGame(): GameState {
     lastSettleAt: now,
     lastSurvivalAt: now,
     lastDayKey: dayKey(now),
+    gameTimeMinutes: 6 * 60,
     day: 1,
     chapter: 1,
     prologueDone: true,
@@ -1225,11 +1266,12 @@ export function newGame(): GameState {
       startedAt: now,
       endsAt: now,
       lastProcessedAt: now,
+      gameMinutes: 0,
     },
     weather: {
       today: "sunny",
       forecast: rollNextForecast(),
-      stormCountdown: 30,
+      stormCountdown: 840,
       stormWarning: false,
     },
     stats: {

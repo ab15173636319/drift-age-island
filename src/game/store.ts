@@ -12,7 +12,6 @@ import {
   getAction,
   newGame,
   settleOffline,
-  spawnDailyTrash,
   startSleep,
   unlockTechNode,
   writeDiary,
@@ -79,6 +78,12 @@ function loadInitial(): {
       const parsed = JSON.parse(raw) as GameState;
       if (parsed.schemaVersion === 1 && parsed.skills && parsed.actionSlots) {
         if (typeof parsed.player?.fatigue !== "number") parsed.player.fatigue = 80;
+        if (typeof parsed.gameTimeMinutes !== "number") {
+          parsed.gameTimeMinutes = Math.max(
+            6 * 60,
+            ((parsed.day ?? 1) - 1) * 24 * 60 + 6 * 60,
+          );
+        }
         if (!parsed.sleep) {
           parsed.sleep = {
             active: false,
@@ -86,7 +91,24 @@ function loadInitial(): {
             startedAt: parsed.lastSettleAt,
             endsAt: parsed.lastSettleAt,
             lastProcessedAt: parsed.lastSettleAt,
+            gameMinutes: 0,
           };
+        }
+        if (typeof parsed.sleep.gameMinutes !== "number") {
+          parsed.sleep.gameMinutes = Math.max(
+            0,
+            (parsed.sleep.endsAt - parsed.sleep.startedAt) / 1000,
+          );
+        }
+        for (const slot of parsed.actionSlots) {
+          if (slot.actionId === "train_gathering") {
+            slot.actionId = null;
+            slot.startedAt = parsed.lastSettleAt;
+            slot.lastSettledAt = parsed.lastSettleAt;
+            slot.completed = 0;
+            slot.paused = false;
+            slot.pauseReason = null;
+          }
         }
         game = parsed;
         isNewSave = false;
@@ -94,10 +116,6 @@ function loadInitial(): {
     }
   } catch {
     game = newGame();
-  }
-
-  if (isNewSave && (!game.trashOnGround || game.trashOnGround.length === 0)) {
-    spawnDailyTrash(game, logs);
   }
 
   const settled = settleOffline(game, now);
@@ -238,7 +256,7 @@ export const useGame = create<GameStore>((set, get) => ({
     const flushed = advanceGameOnline(get().game, now);
     const next = cloneState(flushed.state);
     const logs: LogEntry[] = [...flushed.logs];
-    const durationSec = Math.max(5 * 60, Math.min(12 * 60 * 60, minutes * 60));
+    const durationSec = Math.max(5, Math.min(180, minutes));
     startSleep(next, "nap", durationSec, now, logs);
     set({ game: next, now, logs: withLogs(get().logs, logs) });
   },
@@ -277,7 +295,6 @@ export const useGame = create<GameStore>((set, get) => ({
     localStorage.removeItem(SAVE_KEY);
     const fresh = newGame();
     const logs = [createLog("潮水退去。你醒在北沙滩上。", "story")];
-    spawnDailyTrash(fresh, logs);
     set({
       game: fresh,
       logs,
