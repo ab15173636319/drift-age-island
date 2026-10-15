@@ -6,12 +6,14 @@ import {
   collectTrashItem,
   craftRecipe,
   createLog,
+  deepSleepDuration,
   drinkWater,
   eatBestFood,
   getAction,
   newGame,
   settleOffline,
   spawnDailyTrash,
+  startSleep,
   unlockTechNode,
   writeDiary,
 } from "./core";
@@ -44,6 +46,8 @@ interface GameStore {
   collectAllTrash: () => void;
   drink: () => void;
   eat: () => void;
+  startDeepSleep: () => void;
+  startNap: (minutes: number) => void;
   craft: (recipeId: string) => void;
   build: (buildingId: string) => void;
   unlockTech: (nodeId: string) => void;
@@ -74,6 +78,16 @@ function loadInitial(): {
     if (raw) {
       const parsed = JSON.parse(raw) as GameState;
       if (parsed.schemaVersion === 1 && parsed.skills && parsed.actionSlots) {
+        if (typeof parsed.player?.fatigue !== "number") parsed.player.fatigue = 80;
+        if (!parsed.sleep) {
+          parsed.sleep = {
+            active: false,
+            type: null,
+            startedAt: parsed.lastSettleAt,
+            endsAt: parsed.lastSettleAt,
+            lastProcessedAt: parsed.lastSettleAt,
+          };
+        }
         game = parsed;
         isNewSave = false;
       }
@@ -207,6 +221,26 @@ export const useGame = create<GameStore>((set, get) => ({
     const logs: LogEntry[] = [];
     eatBestFood(next, logs);
     set({ game: next, logs: withLogs(get().logs, logs) });
+  },
+
+  startDeepSleep: () => {
+    const now = Date.now();
+    const flushed = advanceGameOnline(get().game, now);
+    const next = cloneState(flushed.state);
+    const logs: LogEntry[] = [...flushed.logs];
+    const durationSec = deepSleepDuration(next.player.fatigue);
+    startSleep(next, "deep", durationSec, now, logs);
+    set({ game: next, now, logs: withLogs(get().logs, logs) });
+  },
+
+  startNap: (minutes) => {
+    const now = Date.now();
+    const flushed = advanceGameOnline(get().game, now);
+    const next = cloneState(flushed.state);
+    const logs: LogEntry[] = [...flushed.logs];
+    const durationSec = Math.max(5 * 60, Math.min(12 * 60 * 60, minutes * 60));
+    startSleep(next, "nap", durationSec, now, logs);
+    set({ game: next, now, logs: withLogs(get().logs, logs) });
   },
 
   craft: (recipeId) => {

@@ -212,6 +212,116 @@ export function offlineCapHours(state: GameState): number {
   return Math.max(2, Math.min(24, baseLevel(state) + 1));
 }
 
+export function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+export function deepSleepDuration(fatigue: number): number {
+  const hours = 5 + (100 - clamp(fatigue, 0, 100)) / 16;
+  return Math.round(hours * 3600);
+}
+
+export function fatigueRecoveryPerSec(type: "deep" | "nap"): number {
+  return type === "deep" ? 12 / 3600 : 8 / 3600;
+}
+
+export function startSleep(
+  state: GameState,
+  type: "deep" | "nap",
+  durationSec: number,
+  now: number,
+  logs: LogEntry[],
+): void {
+  if (durationSec <= 0) return;
+  state.sleep = {
+    active: true,
+    type,
+    startedAt: now,
+    endsAt: now + durationSec * 1000,
+    lastProcessedAt: now,
+  };
+  const reason = type === "deep" ? "沉睡中" : "小憩中";
+  for (const slot of state.actionSlots) {
+    if (slot.actionId && !slot.paused) {
+      slot.paused = true;
+      slot.pauseReason = reason;
+    }
+  }
+  logs.push(createLog(type === "deep" ? "你陷入沉睡。" : "你坐下小憩。", "info"));
+}
+
+export function wakeFromSleep(state: GameState, wakeAt: number, logs: LogEntry[]): void {
+  const type = state.sleep.type;
+  state.sleep = {
+    active: false,
+    type: null,
+    startedAt: wakeAt,
+    endsAt: wakeAt,
+    lastProcessedAt: wakeAt,
+  };
+  for (const slot of state.actionSlots) {
+    if (slot.pauseReason === "沉睡中" || slot.pauseReason === "小憩中") {
+      slot.paused = false;
+      slot.pauseReason = null;
+      slot.lastSettledAt = wakeAt;
+    }
+  }
+  logs.push(createLog(type === "deep" ? "你从沉睡中醒来。" : "小憩结束，精神恢复了一些。", "info"));
+}
+
+export function processSleep(
+  state: GameState,
+  from: number,
+  to: number,
+  logs: LogEntry[],
+): void {
+  const sleep = state.sleep;
+  if (!sleep.active) return;
+  const end = Math.min(to, sleep.endsAt);
+  const elapsed = Math.max(0, (end - sleep.lastProcessedAt) / 1000);
+  if (elapsed > 0 && sleep.type) {
+    const recovery = fatigueRecoveryPerSec(sleep.type);
+    state.player.fatigue = clamp(
+      state.player.fatigue + elapsed * recovery,
+      0,
+      100,
+    );
+    state.player.stamina = clamp(
+      state.player.stamina + elapsed * (8 / 3600),
+      0,
+      state.player.staminaMax,
+    );
+    sleep.lastProcessedAt = end;
+  }
+  if (to >= sleep.endsAt) {
+    wakeFromSleep(state, sleep.endsAt, logs);
+  }
+}
+
+export function remainingSleepSec(state: GameState, now: number): number {
+  if (!state.sleep.active) return 0;
+  return Math.max(0, (state.sleep.endsAt - now) / 1000);
+}
+
+export function reduceFatigueForAction(state: GameState, action: ActionDefinition): void {
+  const fatiguePerSec = 0.015 + action.staminaCost * 0.004;
+  state.player.fatigue = clamp(
+    state.player.fatigue - action.durationSec * fatiguePerSec,
+    0,
+    100,
+  );
+}
+
+export function maybeFaintFromFatigue(state: GameState, logs: LogEntry[]): boolean {
+  if (state.player.fatigue >= 30 || state.sleep.active) return false;
+  const chance = ((30 - state.player.fatigue) / 30) * 0.04;
+  if (Math.random() >= chance) return false;
+  const durationSec = deepSleepDuration(state.player.fatigue);
+  startSleep(state, "deep", durationSec, Date.now(), logs);
+  logs.push(createLog("过度疲惫让你失去意识，你陷入了沉睡。", "warn"));
+  return true;
+}
+
 export function inventoryCapacity(state: GameState): number {
   let cap = 500;
   const storageLevel = getBuildingLevel(state, "storage");
@@ -542,6 +652,7 @@ export function settleActionSlot(
   durationSec: number,
   actionFactor: number,
   logs: LogEntry[],
+  allowFaint = true,
 ): void {
   if (!slot.actionId || slot.paused) return;
   const action = getAction(slot.actionId);
@@ -580,6 +691,13 @@ export function settleActionSlot(
       }
     }
     addXp(state, action.skill, action.xp, logs);
+    reduceFatigueForAction(state, action);
+    if (allowFaint && maybeFaintFromFatigue(state, logs)) {
+      slot.paused = true;
+      slot.pauseReason = "沉睡中";
+      completed += 1;
+      break;
+    }
     completed += 1;
   }
 
@@ -614,10 +732,11 @@ export function settleSlotsForDuration(
   durationSec: number,
   factor: number,
   logs: LogEntry[],
+  allowFaint = false,
 ): void {
   for (const slot of state.actionSlots) {
     if (!slot.actionId || slot.paused) continue;
-    settleActionSlot(state, slot, durationSec, factor, logs);
+    settleActionSlot(state, slot, durationSec, factor, logs, allowFaint);
   }
 }
 
@@ -747,7 +866,11 @@ export function advanceGameOnline(state: GameState, now: number): { state: GameS
   const logs: LogEntry[] = [];
   const survivalElapsed = Math.max(0, (now - next.lastSurvivalAt) / 1000);
 
-  settleSlotsOnline(next, now, logs);
+  if (next.sleep.active) {
+    processSleep(next, next.sleep.lastProcessedAt, now, logs);
+  } else {
+    settleSlotsOnline(next, now, logs);
+  }
   applySurvivalOnline(next, survivalElapsed, logs);
 
   const key = dayKey(now);
@@ -783,9 +906,16 @@ export function settleOffline(
   const logs: LogEntry[] = [];
   const capHours = offlineCapHours(next);
   const cappedSec = Math.min(elapsedSec, capHours * 3600);
+  const settleTo = next.lastSettleAt + cappedSec * 1000;
+  let remainingTaskSec = cappedSec;
+  if (next.sleep.active) {
+    const processEnd = Math.min(settleTo, next.sleep.endsAt);
+    processSleep(next, next.sleep.lastProcessedAt, processEnd, logs);
+    remainingTaskSec = Math.max(0, (settleTo - processEnd) / 1000);
+  }
   const survival = simulateOfflineSurvival(next, cappedSec);
   const actionFactor = 0.6;
-  settleSlotsForDuration(next, survival.effectiveSec, actionFactor, logs);
+  settleSlotsForDuration(next, Math.min(remainingTaskSec, survival.effectiveSec), actionFactor, logs);
 
   const startDate = new Date(next.lastSettleAt);
   const endDate = new Date(now);
@@ -1077,6 +1207,7 @@ export function newGame(): GameState {
       thirst: 65,
       stamina: 100,
       staminaMax: 100,
+      fatigue: 80,
       mood: 60,
       moodMax: 100,
       hp: 100,
@@ -1086,6 +1217,13 @@ export function newGame(): GameState {
         weapon: "",
         armor: "",
       },
+    },
+    sleep: {
+      active: false,
+      type: null,
+      startedAt: now,
+      endsAt: now,
+      lastProcessedAt: now,
     },
     weather: {
       today: "sunny",
