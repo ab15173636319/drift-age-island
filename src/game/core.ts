@@ -83,6 +83,8 @@ const FOOD_PRIORITY = [
   "smoked_meat",
   "dried_meat",
   "berry",
+  "banana",
+  "coconut",
   "nut",
   "root",
   "fish",
@@ -100,6 +102,8 @@ const FOOD_VALUES: Record<string, number> = {
   smoked_meat: 22,
   dried_meat: 18,
   berry: 8,
+  banana: 9,
+  coconut: 12,
   nut: 8,
   root: 9,
   fish: 10,
@@ -497,20 +501,45 @@ export function availableActionsForSkill(state: GameState, skill: SkillId): Acti
     .sort((a, b) => a.unlockLevel - b.unlockLevel || a.xp - b.xp);
 }
 
-// 熟练度时长缩减：技能等级越高，同样的工作耗时越短（详见 plan/design/00_总览与数值基准.md 第三节）
-export const PROFICIENCY_REDUCTION_PER_LEVEL = 0.003; // 每级 -0.3%
-export const PROFICIENCY_REDUCTION_CAP = 0.3; // 上限 -30%
+// 熟练度时长曲线：低等级惩罚（耗时更长）+ 高等级奖励（耗时更短）
+// 详见 plan/design/00_总览与数值基准.md 第三节
+export const LOW_LEVEL_PENALTY_PER_LEVEL = 0.025; // Lv25 以下每低 1 级，耗时 +2.5%
+export const NEUTRAL_LEVEL = 25; // 耗时系数 = 1.0 的基准等级
+export const HIGH_LEVEL_REDUCTION_PER_LEVEL = 0.00405; // Lv25 以上每级 -0.405%
+export const HIGH_LEVEL_REDUCTION_CAP = 0.3; // 高等级缩减上限 -30%（Lv99 恰好触顶）
 
 export function proficiencyDurationFactor(level: number): number {
+  const l = Math.max(1, level);
+  if (l <= NEUTRAL_LEVEL) {
+    // 低等级惩罚：Lv1 耗时 ×1.60，逐级收敛到 Lv25 的 ×1.00
+    return 1 + (NEUTRAL_LEVEL - l) * LOW_LEVEL_PENALTY_PER_LEVEL;
+  }
+  // 高等级奖励：Lv25 之后逐级提速，Lv99 触顶 ×0.70
   const reduction = Math.min(
-    Math.max(0, level) * PROFICIENCY_REDUCTION_PER_LEVEL,
-    PROFICIENCY_REDUCTION_CAP,
+    (l - NEUTRAL_LEVEL) * HIGH_LEVEL_REDUCTION_PER_LEVEL,
+    HIGH_LEVEL_REDUCTION_CAP,
   );
   return 1 - reduction;
 }
 
 export function proficiencyDurationFor(level: number, baseDuration: number): number {
   return baseDuration * proficiencyDurationFactor(level);
+}
+
+// 失败概率：技能等级越低，同一次工作的失败率越高（Lv1 ≈18.5%，Lv50 ≈5.3%，Lv99 ≈2.1%）
+// 失败结算：无产出、不损耗材料，但仍消耗时间与体力，只给少量 XP（见 FAILURE_XP_RATE）
+export const FAILURE_BASE = 0.18;
+export const FAILURE_DECAY_LEVELS = 35;
+export const FAILURE_FLOOR = 0.01;
+export const FAILURE_XP_RATE = 0.2; // 失败只获得 20% 经验（至少 1 点）
+
+export function actionFailureChance(level: number): number {
+  const l = Math.max(0, level);
+  return Math.max(FAILURE_FLOOR, FAILURE_BASE * Math.exp(-l / FAILURE_DECAY_LEVELS) + FAILURE_FLOOR);
+}
+
+export function failureXp(baseXp: number): number {
+  return Math.max(1, Math.round(baseXp * FAILURE_XP_RATE));
 }
 
 export function computeEfficiency(state: GameState, action: ActionDefinition): number {
@@ -723,6 +752,8 @@ export function settleActionSlot(
   const billableSec = Math.max(0, durationSec) * actionFactor;
   const possible = Math.floor(billableSec / effectiveActionDuration);
   let completed = 0;
+  let failedTimes = 0;
+  let xpGain = 0;
   const aggregatedOutput: Record<string, number> = {};
   let knowledgeGain = 0;
 
@@ -733,24 +764,34 @@ export function settleActionSlot(
       logs.push(createLog(`${action.name}缺少材料，已暂停`, "warn"));
       break;
     }
-    if (Object.keys(action.output).length > 0 && !canAdd(state, action.output)) {
-      slot.paused = true;
-      slot.pauseReason = "背包已满";
-      logs.push(createLog("背包已满，行动自动暂停", "warn"));
-      break;
-    }
-    if (action.consume) removeItems(state, action.consume);
-    if (action.skill === "research" && action.output.knowledge) {
-      const gained = (action.output.knowledge ?? 0) * researchMultiplier(state);
-      state.tech.knowledge += gained;
-      knowledgeGain += gained;
-    } else if (Object.keys(action.output).length > 0) {
-      const added = addItems(state, action.output);
-      for (const [id, amount] of Object.entries(added)) {
-        aggregatedOutput[id] = (aggregatedOutput[id] ?? 0) + amount;
+    // 失败判定：技能等级越低越容易失败。失败无产出、不损耗材料，但仍消耗时间与体力，只给少量 XP。
+    const failed = Math.random() < actionFailureChance(state.skills[action.skill].level);
+    if (failed) {
+      failedTimes += 1;
+      const lostXp = failureXp(action.xp);
+      xpGain += lostXp;
+      addXp(state, action.skill, lostXp, logs);
+    } else {
+      if (Object.keys(action.output).length > 0 && !canAdd(state, action.output)) {
+        slot.paused = true;
+        slot.pauseReason = "背包已满";
+        logs.push(createLog("背包已满，行动自动暂停", "warn"));
+        break;
       }
+      if (action.consume) removeItems(state, action.consume);
+      if (action.skill === "research" && action.output.knowledge) {
+        const gained = (action.output.knowledge ?? 0) * researchMultiplier(state);
+        state.tech.knowledge += gained;
+        knowledgeGain += gained;
+      } else if (Object.keys(action.output).length > 0) {
+        const added = addItems(state, action.output);
+        for (const [id, amount] of Object.entries(added)) {
+          aggregatedOutput[id] = (aggregatedOutput[id] ?? 0) + amount;
+        }
+      }
+      xpGain += action.xp;
+      addXp(state, action.skill, action.xp, logs);
     }
-    addXp(state, action.skill, action.xp, logs);
     advanceGameTime(
       state,
       proficiencyDurationFor(state.skills[action.skill].level, action.durationSec),
@@ -788,11 +829,13 @@ export function settleActionSlot(
       resultParts.push(`知识点×${Math.round(knowledgeGain)}`);
     }
     const parts = resultParts.join("，");
-    const xpGain = completed * action.xp;
+    const success = completed - failedTimes;
+    const failNote = failedTimes > 0 ? `，失败 ${failedTimes} 次` : "";
+    const xpNote = `+${Math.round(xpGain)} XP${failNote}`;
     const text = parts
-      ? `${action.name} ×${completed}：${parts}，+${Math.round(xpGain)} XP`
-      : `${action.name}：完成 ${completed} 次，+${Math.round(xpGain)} XP`;
-    logs.push(createLog(text, "gain"));
+      ? `${action.name} ×${completed}：${parts}${success < completed ? `（成功 ${success} 次）` : ""}，${xpNote}`
+      : `${action.name}：${failedTimes > 0 ? `行动 ${completed} 次，成功 ${success} 次，失败 ${failedTimes} 次` : `完成 ${completed} 次`}，${xpNote}`;
+    logs.push(createLog(text, failedTimes > 0 && success === 0 ? "warn" : "gain"));
   }
 }
 
@@ -1085,10 +1128,19 @@ export function craftRecipe(
     logs.push(createLog("背包空间不足", "warn"));
     return false;
   }
+  const level = state.skills[recipe.skill].level;
+  const duration = proficiencyDurationFor(level, recipe.durationSec);
+  // 失败判定：技能等级越低越容易失败。失败不损耗材料，但消耗时间，只给少量 XP。
+  if (Math.random() < actionFailureChance(level)) {
+    addXp(state, recipe.skill, failureXp(recipe.xp), logs);
+    advanceGameTime(state, duration, logs);
+    logs.push(createLog(`制作失败：${recipe.name}，材料未损耗，白费了 ${Math.round(duration)} 分钟`, "warn"));
+    checkAchievements(state, logs);
+    return true;
+  }
   removeItems(state, recipe.input);
   addItems(state, recipe.output);
   addXp(state, recipe.skill, recipe.xp, logs);
-  const duration = proficiencyDurationFor(state.skills[recipe.skill].level, recipe.durationSec);
   advanceGameTime(state, duration, logs);
   logs.push(createLog(`制作完成：${recipe.name}，花费 ${Math.round(duration)} 分钟`, "gain"));
   checkAchievements(state, logs);
@@ -1113,11 +1165,21 @@ export function buildBuilding(
     logs.push(createLog(`${building.name}材料不足`, "warn"));
     return false;
   }
+  const buildLevel = state.skills.construction.level;
+  const buildDuration = proficiencyDurationFor(buildLevel, 120);
+  // 失败判定：技能等级越低越容易失败。建造失败材料不损耗（可原地返工），但白费时间、只给少量 XP。
+  if (Math.random() < actionFailureChance(buildLevel)) {
+    addXp(state, "construction", 10, logs);
+    advanceGameTime(state, buildDuration, logs);
+    logs.push(createLog(`建造失败：${building.name} 返工，材料未损耗，白费 ${Math.round(buildDuration)} 分钟`, "warn"));
+    checkAchievements(state, logs);
+    return true;
+  }
   removeItems(state, cost.materials);
   state.buildings[buildingId] = currentLevel + 1;
   state.player.mood = Math.min(state.player.moodMax, state.player.mood + 8);
   addXp(state, "construction", 40 + currentLevel * 30, logs);
-  advanceGameTime(state, proficiencyDurationFor(state.skills.construction.level, 120), logs);
+  advanceGameTime(state, buildDuration, logs);
   logs.push(createLog(`建造完成：${building.name} Lv${currentLevel + 1}`, "gain"));
   unlockRegions(state);
   checkAchievements(state, logs);

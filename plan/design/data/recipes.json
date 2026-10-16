@@ -1,7 +1,14 @@
 {
-  "// 说明": "全部制作配方。skill 为所需技能，unlockLevel 为解锁等级，output 为产出",
+  "// 说明": "全部制作配方。skill 为所需技能，unlockLevel 为解锁等级，output 为产出。每个制作技能同样是一条「基础 → 高级」的工作链；等级越低单次耗时越长、失败率越高（见 00_总览与数值基准.md 第三节）",
 
   "toolcraft": {
+    "stone_blade": {
+      "name": "打制石片",
+      "skill": "toolcraft", "unlockLevel": 1,
+      "input": { "flint": 1 },
+      "output": { "stone_blade": 1 },
+      "durationSec": 4, "xp": 10
+    },
     "stone_axe": {
       "name": "石斧",
       "skill": "toolcraft", "unlockLevel": 3,
@@ -16,19 +23,13 @@
       "output": { "stone_knife": 1 },
       "durationSec": 8, "xp": 25
     },
-    "bone_spear": {
-      "name": "骨矛",
-      "skill": "toolcraft", "unlockLevel": 12,
-      "input": { "bone": 5, "wood": 3, "vine": 2 },
-      "output": { "bone_spear": 1 },
-      "durationSec": 12, "xp": 50
-    },
-    "metal_axe": {
-      "name": "金属斧",
-      "skill": "toolcraft", "unlockLevel": 22,
-      "input": { "metal_scrap": 1, "wood": 5, "vine": 3 },
-      "output": { "metal_axe": 1 },
-      "durationSec": 20, "xp": 100
+    "torch": {
+      "name": "火把",
+      "skill": "toolcraft", "unlockLevel": 5,
+      "input": { "branch": 3, "leaves": 2 },
+      "output": { "torch": 1 },
+      "durationSec": 6, "xp": 25,
+      "effect": "山洞探索不摸黑"
     },
     "vine_armor": {
       "name": "藤甲",
@@ -37,12 +38,40 @@
       "output": { "vine_armor": 1 },
       "durationSec": 15, "xp": 40
     },
+    "bone_spear": {
+      "name": "骨矛",
+      "skill": "toolcraft", "unlockLevel": 12,
+      "input": { "bone": 5, "wood": 3, "vine": 2 },
+      "output": { "bone_spear": 1 },
+      "durationSec": 12, "xp": 50
+    },
+    "harpoon": {
+      "name": "鱼叉",
+      "skill": "toolcraft", "unlockLevel": 12,
+      "input": { "bone": 2, "bamboo": 3, "vine": 1 },
+      "output": { "harpoon": 1 },
+      "durationSec": 10, "xp": 50
+    },
     "metal_plate_armor": {
       "name": "金属片甲",
       "skill": "toolcraft", "unlockLevel": 14,
       "input": { "metal_scrap": 3, "vine": 5 },
       "output": { "metal_plate_armor": 1 },
       "durationSec": 25, "xp": 80
+    },
+    "metal_axe": {
+      "name": "金属斧",
+      "skill": "toolcraft", "unlockLevel": 22,
+      "input": { "metal_scrap": 1, "wood": 5, "vine": 3 },
+      "output": { "metal_axe": 1 },
+      "durationSec": 20, "xp": 100
+    },
+    "metal_knife_set": {
+      "name": "金属刀具组",
+      "skill": "toolcraft", "unlockLevel": 35,
+      "input": { "metal": 8, "hardwood": 2 },
+      "output": { "metal_knife_set": 1 },
+      "durationSec": 25, "xp": 200
     }
   },
 
@@ -54,13 +83,6 @@
       "output": { "rope": 1 },
       "durationSec": 5, "xp": 15
     },
-    "fishing_net": {
-      "name": "渔网",
-      "skill": "weaving", "unlockLevel": 12,
-      "input": { "rope": 5, "fishing_line": 2 },
-      "output": { "fishing_net": 1 },
-      "durationSec": 15, "xp": 50
-    },
     "basket": {
       "name": "筐",
       "skill": "weaving", "unlockLevel": 5,
@@ -68,30 +90,59 @@
       "output": { "basket": 1 },
       "durationSec": 8, "xp": 20
     },
+    "fishing_net": {
+      "name": "渔网",
+      "skill": "weaving", "unlockLevel": 12,
+      "input": { "rope": 5, "fishing_line": 2 },
+      "output": { "fishing_net": 1 },
+      "durationSec": 15, "xp": 50
+    },
+    "cable_rope": {
+      "name": "缆绳",
+      "skill": "weaving", "unlockLevel": 22,
+      "input": { "rope": 3, "fishing_line": 1 },
+      "output": { "cable_rope": 1 },
+      "durationSec": 12, "xp": 90
+    },
     "raft_part": {
       "name": "筏子部件",
-      "skill": "weaving", "unlockLevel": 22,
-      "input": { "bamboo": 10, "rope": 5 },
+      "skill": "weaving", "unlockLevel": 35,
+      "input": { "bamboo": 10, "cable_rope": 3 },
       "output": { "raft_part": 1 },
-      "durationSec": 20, "xp": 100
+      "durationSec": 20, "xp": 200
+    },
+    "sail": {
+      "name": "船帆",
+      "skill": "weaving", "unlockLevel": 55,
+      "input": { "waterproof_cloth": 2, "cable_rope": 5 },
+      "output": { "sail": 1 },
+      "durationSec": 30, "xp": 350
     }
   },
 
   "pottery": {
+    "clay_body": {
+      "name": "捏制陶坯",
+      "skill": "pottery", "unlockLevel": 1,
+      "input": { "clay": 3 },
+      "output": { "clay_body": 1 },
+      "durationSec": 5, "xp": 10
+    },
+    "coconut_bowl": {
+      "name": "椰壳碗",
+      "skill": "pottery", "unlockLevel": 1,
+      "input": { "coconut": 2 },
+      "output": { "coconut_bowl": 1 },
+      "durationSec": 4, "xp": 10,
+      "effect": "储水容量 12"
+    },
     "clay_pot": {
       "name": "陶罐",
       "skill": "pottery", "unlockLevel": 5,
-      "input": { "clay": 5 },
+      "input": { "clay_body": 3, "charcoal": 2 },
       "output": { "clay_pot": 1 },
-      "durationSec": 10, "xp": 25
-    },
-    "water_container": {
-      "name": "储水器",
-      "skill": "pottery", "unlockLevel": 22,
-      "input": { "clay_pot": 2, "plastic_bottle": 3, "vine": 3 },
-      "output": { "water_container": 1 },
-      "durationSec": 20, "xp": 80,
-      "effect": "离线水分上限 +50%"
+      "durationSec": 10, "xp": 25,
+      "effect": "储水容量 40"
     },
     "glazed_pot": {
       "name": "釉面陶罐",
@@ -99,17 +150,99 @@
       "input": { "clay_pot": 1, "glass": 1 },
       "output": { "glazed_pot": 1 },
       "durationSec": 15, "xp": 50
+    },
+    "water_container": {
+      "name": "储水器",
+      "skill": "pottery", "unlockLevel": 22,
+      "input": { "plastic_bottle": 3, "vine": 5 },
+      "output": { "water_container": 1 },
+      "durationSec": 20, "xp": 80,
+      "effect": "离线水分上限 +50%"
+    },
+    "big_vat": {
+      "name": "大型陶缸",
+      "skill": "pottery", "unlockLevel": 35,
+      "input": { "clay_body": 8, "charcoal": 5 },
+      "output": { "big_vat": 1 },
+      "durationSec": 30, "xp": 200,
+      "effect": "储水容量 120"
+    },
+    "cistern": {
+      "name": "蓄水池衬砌",
+      "skill": "pottery", "unlockLevel": 55,
+      "input": { "big_vat": 2, "stone": 500, "waterproof_cloth": 1 },
+      "output": { "cistern": 1 },
+      "durationSec": 45, "xp": 400,
+      "effect": "储水容量 240"
     }
   },
 
   "salvage": {
+    "plastic_granule": {
+      "name": "拆解塑料件",
+      "skill": "salvage", "unlockLevel": 1,
+      "input": { "plastic_bottle": 3 },
+      "output": { "plastic_granule": 1 },
+      "durationSec": 4, "xp": 10
+    },
+    "repurpose_plank": {
+      "name": "处理木板",
+      "skill": "salvage", "unlockLevel": 1,
+      "input": { "wood_plank": 2 },
+      "output": { "wood": 5 },
+      "durationSec": 5, "xp": 12
+    },
+    "shape_metal": {
+      "name": "金属片整形",
+      "skill": "salvage", "unlockLevel": 5,
+      "input": { "metal_scrap": 2, "flint": 1 },
+      "output": { "metal": 3 },
+      "durationSec": 8, "xp": 25
+    },
+    "draw_copper": {
+      "name": "铜线抽取",
+      "skill": "salvage", "unlockLevel": 12,
+      "input": { "cable": 1 },
+      "output": { "copper_wire": 3 },
+      "durationSec": 8, "xp": 50
+    },
+    "cut_glass": {
+      "name": "玻璃切割",
+      "skill": "salvage", "unlockLevel": 12,
+      "input": { "glass_fragment": 3 },
+      "output": { "glass": 2 },
+      "durationSec": 6, "xp": 45
+    },
     "water_filter": {
       "name": "取火透镜",
-      "skill": "salvage", "unlockLevel": 1,
+      "skill": "salvage", "unlockLevel": 12,
       "input": { "glass": 1, "flint": 1 },
       "output": { "fire_lens": 1 },
       "durationSec": 5, "xp": 20,
       "effect": "生火效率 +30%"
+    },
+    "calibrate_compass": {
+      "name": "指南针校准",
+      "skill": "salvage", "unlockLevel": 12,
+      "input": { "compass": 1, "metal": 2 },
+      "output": { "calibrated_compass": 1 },
+      "durationSec": 10, "xp": 60,
+      "effect": "探索度 +0.6%/次"
+    },
+    "steel_pipe": {
+      "name": "改造钢管",
+      "skill": "salvage", "unlockLevel": 22,
+      "input": { "metal": 8, "hardwood": 3 },
+      "output": { "steel_pipe": 1 },
+      "durationSec": 20, "xp": 120
+    },
+    "rebuild_first_aid": {
+      "name": "急救包重组",
+      "skill": "salvage", "unlockLevel": 22,
+      "input": { "first_aid_kit": 1, "medicine_packaging": 3 },
+      "output": { "field_kit": 1 },
+      "durationSec": 25, "xp": 130,
+      "effect": "战场急救"
     },
     "mastery_token_wood": {
       "name": "专精凭证（木质）",
@@ -142,10 +275,33 @@
       "output": { "solar_charger": 1 },
       "durationSec": 60, "xp": 500,
       "effect": "手机永久供电"
+    },
+    "composite_armor": {
+      "name": "复合护甲",
+      "skill": "salvage", "unlockLevel": 55,
+      "input": { "metal_scrap": 6, "vine_armor": 1, "cable_rope": 2 },
+      "output": { "composite_armor": 1 },
+      "durationSec": 30, "xp": 220
+    },
+    "radio_repair": {
+      "name": "无线电修复件",
+      "skill": "salvage", "unlockLevel": 55,
+      "input": { "radio_module": 1, "metal": 10, "copper_wire": 5 },
+      "output": { "radio_repair": 1 },
+      "durationSec": 40, "xp": 450,
+      "effect": "结局 C 前置"
     }
   },
 
   "medicine": {
+    "herb_salve": {
+      "name": "草药敷料",
+      "skill": "medicine", "unlockLevel": 1,
+      "input": { "herb": 2 },
+      "output": { "herb_salve": 1 },
+      "durationSec": 5, "xp": 10,
+      "cure": "bleeding"
+    },
     "bandage": {
       "name": "止血绷带",
       "skill": "medicine", "unlockLevel": 5,
@@ -153,6 +309,14 @@
       "output": { "bandage": 1 },
       "durationSec": 5, "xp": 20,
       "cure": "bleeding"
+    },
+    "insect_repellent": {
+      "name": "驱虫药",
+      "skill": "medicine", "unlockLevel": 10,
+      "input": { "herb": 4, "charcoal": 2 },
+      "output": { "insect_repellent": 1 },
+      "durationSec": 8, "xp": 30,
+      "cure": "infection"
     },
     "antidote": {
       "name": "解毒剂",
@@ -170,13 +334,13 @@
       "durationSec": 10, "xp": 45,
       "cure": "fever"
     },
-    "insect_repellent": {
-      "name": "驱虫药",
-      "skill": "medicine", "unlockLevel": 10,
-      "input": { "herb": 4, "charcoal": 2 },
-      "output": { "insect_repellent": 1 },
-      "durationSec": 8, "xp": 30,
-      "cure": "infection"
+    "panacea": {
+      "name": "万能药",
+      "skill": "medicine", "unlockLevel": 35,
+      "input": { "first_aid_kit": 1, "herb": 10 },
+      "output": { "panacea": 1 },
+      "durationSec": 25, "xp": 200,
+      "cure": "all"
     }
   },
 
@@ -189,6 +353,27 @@
       "durationSec": 5, "xp": 15,
       "effect": "饱食效率 +50%"
     },
+    "roasted_fish": {
+      "name": "烤鱼",
+      "skill": "cooking", "unlockLevel": 5,
+      "input": { "fish": 2 },
+      "output": { "cooked_food": 2 },
+      "durationSec": 6, "xp": 20
+    },
+    "roast_meat": {
+      "name": "烤肉",
+      "skill": "cooking", "unlockLevel": 5,
+      "input": { "raw_meat": 2 },
+      "output": { "cooked_food": 3 },
+      "durationSec": 8, "xp": 22
+    },
+    "root_soup": {
+      "name": "煮根茎汤",
+      "skill": "cooking", "unlockLevel": 12,
+      "input": { "root": 3, "water": 2 },
+      "output": { "cooked_food": 3 },
+      "durationSec": 8, "xp": 40
+    },
     "smoked_meat": {
       "name": "熏肉",
       "skill": "cooking", "unlockLevel": 12,
@@ -196,6 +381,21 @@
       "output": { "smoked_meat": 3 },
       "durationSec": 15, "xp": 50,
       "effect": "保存期 ×3"
+    },
+    "charcoal_burn": {
+      "name": "烧制木炭",
+      "skill": "cooking", "unlockLevel": 12,
+      "input": { "wood": 5 },
+      "output": { "charcoal": 3, "ash": 1 },
+      "durationSec": 10, "xp": 45
+    },
+    "grand_feast": {
+      "name": "高级料理",
+      "skill": "cooking", "unlockLevel": 35,
+      "input": { "smoked_meat": 2, "mushroom": 3 },
+      "output": { "feast": 1 },
+      "durationSec": 15, "xp": 120,
+      "effect": "饱食 +40，心态 +3"
     }
   }
 }

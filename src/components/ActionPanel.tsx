@@ -1,4 +1,5 @@
 import {
+  actionFailureChance,
   availableActionsForSkill,
   computeEfficiency,
   getAction,
@@ -20,6 +21,7 @@ function ActionRow({
   const game = useGame((state) => state.game);
   const level = game.skills[action.skill].level;
   const duration = proficiencyDurationFor(level, action.durationSec);
+  const failChance = actionFailureChance(level);
   const unlocked = level >= action.unlockLevel;
   const canRun = unlocked && (!action.consume || hasItems(game, action.consume));
   const isRunning = game.actionSlots.some(
@@ -48,6 +50,9 @@ function ActionRow({
             {Math.round(duration)} 分钟 · {formatDuration(duration)}
           </span>
           <span>+{formatNumber(action.xp)} XP</span>
+          {action.xp > 0 && (
+            <span className="muted">失败 {Math.round(failChance * 100)}%</span>
+          )}
           {outputs && <span>{outputs}</span>}
         </div>
       </div>

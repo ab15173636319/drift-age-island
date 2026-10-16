@@ -1,5 +1,5 @@
 {
-  "// 说明": "所有行动定义。durationMin 为游戏内耗时（分钟），tier 对应 tiers.json 的档位",
+  "// 说明": "所有行动定义。durationMin 为游戏内耗时（分钟），tier 对应 tiers.json 的档位。每项技能都是一条「基础 → 高级」的工作链，等级越低单次耗时越长、失败率越高（见 00_总览与数值基准.md 第三节）",
 
   "gathering": {
     "pick_berries": {
@@ -7,10 +7,20 @@
       "durationMin": 30, "xp": 10, "output": { "berry": 1 },
       "staminaCost": 1, "region": "north_beach", "riskEvents": []
     },
+    "gather_banana": {
+      "skill": "gathering", "tier": "T1", "unlockLevel": 2, "unlockRequires": [],
+      "durationMin": 32, "xp": 10, "output": { "banana": 1 },
+      "staminaCost": 1, "region": "north_beach", "riskEvents": []
+    },
     "gather_nuts": {
       "skill": "gathering", "tier": "T2", "unlockLevel": 5, "unlockRequires": [],
       "durationMin": 40, "xp": 26, "output": { "nut": 2 },
       "staminaCost": 1, "region": "north_beach", "riskEvents": []
+    },
+    "gather_coconut": {
+      "skill": "gathering", "tier": "T2", "unlockLevel": 5, "unlockRequires": [],
+      "durationMin": 45, "xp": 26, "output": { "coconut": 2 },
+      "staminaCost": 2, "region": "north_beach", "riskEvents": []
     },
     "dig_root": {
       "skill": "gathering", "tier": "T3", "unlockLevel": 12, "unlockRequires": [],
@@ -81,10 +91,145 @@
       "durationMin": 105, "xp": 320, "output": { "hardwood": 8 },
       "staminaCost": 5, "region": "deep_forest", "riskEvents": []
     },
+    "ironbark_log": {
+      "skill": "woodcutting", "tier": "T6", "unlockLevel": 55, "unlockRequires": ["region:deep_forest", "item:metal_axe"],
+      "durationMin": 120, "xp": 700, "output": { "hardwood": 12 },
+      "staminaCost": 6, "region": "deep_forest", "riskEvents": []
+    },
     "master_woodcut": {
       "skill": "woodcutting", "tier": "T7", "unlockLevel": 75, "unlockRequires": [],
       "durationMin": 120, "xp": 1500, "output": { "hardwood": 18 },
       "staminaCost": 7, "region": "deep_forest", "riskEvents": []
+    }
+  },
+
+  "mining": {
+    "gather_stone": {
+      "skill": "mining", "tier": "T1", "unlockLevel": 1, "unlockRequires": [],
+      "durationMin": 30, "xp": 10, "output": { "stone": 1 },
+      "staminaCost": 1, "region": "north_beach", "riskEvents": []
+    },
+    "collect_flint": {
+      "skill": "mining", "tier": "T2", "unlockLevel": 5, "unlockRequires": [],
+      "durationMin": 40, "xp": 26, "output": { "flint": 2 },
+      "staminaCost": 1, "region": "north_beach", "riskEvents": []
+    },
+    "dig_clay": {
+      "skill": "mining", "tier": "T3", "unlockLevel": 12, "unlockRequires": [],
+      "durationMin": 50, "xp": 62, "output": { "clay": 3 },
+      "staminaCost": 2, "region": "north_beach", "riskEvents": []
+    },
+    "mine_guano_bed": {
+      "skill": "mining", "tier": "T3", "unlockLevel": 12, "unlockRequires": ["region:cave"],
+      "durationMin": 50, "xp": 62, "output": { "fertilizer": 3 },
+      "staminaCost": 2, "region": "cave", "riskEvents": []
+    },
+    "mine_iron": {
+      "skill": "mining", "tier": "T4", "unlockLevel": 22, "unlockRequires": ["region:cave"],
+      "durationMin": 60, "xp": 145, "output": { "iron_ore": 5 },
+      "staminaCost": 3, "region": "cave", "riskEvents": []
+    },
+    "deep_ore_vein": {
+      "skill": "mining", "tier": "T5", "unlockLevel": 35, "unlockRequires": ["region:cave"],
+      "durationMin": 75, "xp": 320, "output": { "iron_ore": 8, "flint": 4 },
+      "staminaCost": 4, "region": "cave", "riskEvents": []
+    },
+    "mine_sulfur": {
+      "skill": "mining", "tier": "T6", "unlockLevel": 55, "unlockRequires": ["region:highland"],
+      "durationMin": 90, "xp": 700, "output": { "sulfur": 12 },
+      "staminaCost": 5, "region": "highland", "riskEvents": []
+    },
+    "master_mining": {
+      "skill": "mining", "tier": "T7", "unlockLevel": 75, "unlockRequires": [],
+      "durationMin": 120, "xp": 1500, "output": { "iron_ore": 18 },
+      "staminaCost": 6, "region": "cave", "riskEvents": []
+    }
+  },
+
+  "fishing": {
+    "catch_crab_hands": {
+      "skill": "fishing", "tier": "T1", "unlockLevel": 1, "unlockRequires": [],
+      "durationMin": 30, "xp": 10, "output": { "crab_meat": 1 },
+      "staminaCost": 1, "region": "east_reef", "riskEvents": []
+    },
+    "pick_shells": {
+      "skill": "fishing", "tier": "T1", "unlockLevel": 1, "unlockRequires": [],
+      "durationMin": 30, "xp": 10, "output": { "shell": 1 },
+      "staminaCost": 1, "region": "east_reef", "riskEvents": []
+    },
+    "dry_salt": {
+      "skill": "fishing", "tier": "T2", "unlockLevel": 5, "unlockRequires": ["building:firepit"],
+      "durationMin": 40, "xp": 26, "output": { "salt": 2 },
+      "staminaCost": 1, "region": "east_reef", "riskEvents": []
+    },
+    "spear_fishing": {
+      "skill": "fishing", "tier": "T3", "unlockLevel": 12, "unlockRequires": ["item:harpoon"],
+      "durationMin": 50, "xp": 62, "output": { "fish": 3 },
+      "staminaCost": 2, "region": "east_reef", "riskEvents": []
+    },
+    "collect_urchin": {
+      "skill": "fishing", "tier": "T3", "unlockLevel": 12, "unlockRequires": [],
+      "durationMin": 50, "xp": 62, "output": { "sea_urchin": 3 },
+      "staminaCost": 2, "region": "east_reef", "riskEvents": []
+    },
+    "net_fishing": {
+      "skill": "fishing", "tier": "T5", "unlockLevel": 35, "unlockRequires": ["item:fishing_net"],
+      "durationMin": 75, "xp": 320, "output": { "fish": 8, "crab_meat": 3 },
+      "staminaCost": 4, "region": "east_reef", "riskEvents": []
+    },
+    "deep_dive_fishing": {
+      "skill": "fishing", "tier": "T6", "unlockLevel": 55, "unlockRequires": ["region:shipwreck"],
+      "durationMin": 90, "xp": 700, "output": { "fish": 12 },
+      "staminaCost": 5, "region": "shipwreck", "riskEvents": [ { "id": "shark", "chance": 0.08 } ]
+    },
+    "master_fishing": {
+      "skill": "fishing", "tier": "T7", "unlockLevel": 75, "unlockRequires": [],
+      "durationMin": 120, "xp": 1500, "output": { "fish": 18 },
+      "staminaCost": 6, "region": "east_reef", "riskEvents": []
+    }
+  },
+
+  "hunting": {
+    "catch_insects": {
+      "skill": "hunting", "tier": "T1", "unlockLevel": 1, "unlockRequires": [],
+      "durationMin": 30, "xp": 10, "output": { "insect_protein": 1 },
+      "staminaCost": 1, "region": "north_beach", "riskEvents": []
+    },
+    "set_small_trap": {
+      "skill": "hunting", "tier": "T2", "unlockLevel": 5, "unlockRequires": [],
+      "durationMin": 40, "xp": 26, "output": { "insect_protein": 2 },
+      "consume": { "rope": 1 },
+      "staminaCost": 1, "region": "thorn_belt", "riskEvents": []
+    },
+    "set_bird_snare": {
+      "skill": "hunting", "tier": "T3", "unlockLevel": 12, "unlockRequires": [],
+      "durationMin": 50, "xp": 62, "output": { "poultry": 3, "feather": 2 },
+      "consume": { "rope": 1 },
+      "staminaCost": 2, "region": "thorn_belt", "riskEvents": []
+    },
+    "set_mid_trap": {
+      "skill": "hunting", "tier": "T3", "unlockLevel": 12, "unlockRequires": [],
+      "durationMin": 50, "xp": 62, "output": { "raw_meat": 3, "leather": 1 },
+      "consume": { "rope": 1 },
+      "staminaCost": 2, "region": "thorn_belt", "riskEvents": [ { "id": "bleeding", "chance": 0.08 } ]
+    },
+    "set_large_trap": {
+      "skill": "hunting", "tier": "T4", "unlockLevel": 22, "unlockRequires": ["region:outer_forest"],
+      "durationMin": 60, "xp": 145, "output": { "raw_meat": 5, "leather": 2, "bone": 2 },
+      "consume": { "rope": 2 },
+      "staminaCost": 3, "region": "outer_forest", "riskEvents": []
+    },
+    "deep_hunt_trail": {
+      "skill": "hunting", "tier": "T5", "unlockLevel": 35, "unlockRequires": ["region:deep_forest"],
+      "durationMin": 75, "xp": 320, "output": { "raw_meat": 8 },
+      "consume": { "rope": 2 },
+      "staminaCost": 4, "region": "deep_forest", "riskEvents": []
+    },
+    "master_trap": {
+      "skill": "hunting", "tier": "T7", "unlockLevel": 75, "unlockRequires": [],
+      "durationMin": 120, "xp": 1500, "output": { "raw_meat": 10, "leather": 5, "bone": 5, "poultry": 5 },
+      "consume": { "rope": 3 },
+      "staminaCost": 6, "region": "deep_forest", "riskEvents": []
     }
   },
 
@@ -125,7 +270,50 @@
     }
   },
 
+  "athletics": {
+    "wade_shallows": {
+      "skill": "athletics", "tier": "T1", "unlockLevel": 1, "unlockRequires": [],
+      "durationMin": 30, "xp": 10, "output": {},
+      "staminaCost": 1, "region": "north_beach", "riskEvents": []
+    },
+    "shore_swim": {
+      "skill": "athletics", "tier": "T2", "unlockLevel": 5, "unlockRequires": [],
+      "durationMin": 40, "xp": 26, "output": {},
+      "staminaCost": 2, "region": "east_reef", "riskEvents": []
+    },
+    "bay_crossing": {
+      "skill": "athletics", "tier": "T3", "unlockLevel": 12, "unlockRequires": [],
+      "durationMin": 50, "xp": 62, "output": {},
+      "staminaCost": 3, "region": "east_reef", "riskEvents": []
+    },
+    "reef_dive": {
+      "skill": "athletics", "tier": "T4", "unlockLevel": 22, "unlockRequires": ["region:east_reef"],
+      "durationMin": 60, "xp": 145, "output": {},
+      "staminaCost": 4, "region": "east_reef", "riskEvents": []
+    },
+    "deep_water_dive": {
+      "skill": "athletics", "tier": "T5", "unlockLevel": 35, "unlockRequires": ["region:shipwreck"],
+      "durationMin": 75, "xp": 320, "output": {},
+      "staminaCost": 5, "region": "shipwreck", "riskEvents": [ { "id": "shark", "chance": 0.06 } ]
+    },
+    "night_swim_drill": {
+      "skill": "athletics", "tier": "T6", "unlockLevel": 55, "unlockRequires": [],
+      "durationMin": 90, "xp": 700, "output": {},
+      "staminaCost": 5, "region": "east_reef", "riskEvents": []
+    },
+    "master_swim": {
+      "skill": "athletics", "tier": "T7", "unlockLevel": 75, "unlockRequires": [],
+      "durationMin": 120, "xp": 1500, "output": {},
+      "staminaCost": 6, "region": "shipwreck", "riskEvents": []
+    }
+  },
+
   "research": {
+    "record_finding": {
+      "skill": "research", "tier": "T1", "unlockLevel": 1, "unlockRequires": [],
+      "durationMin": 30, "xp": 10, "output": { "knowledge": 6 },
+      "staminaCost": 0, "region": "north_beach", "riskEvents": []
+    },
     "study_manual_page": {
       "skill": "research", "tier": "T3", "unlockLevel": 12, "unlockRequires": ["item:manual_page"],
       "durationMin": 30, "xp": 62, "output": { "knowledge": 8 },
@@ -148,6 +336,12 @@
       "skill": "research", "tier": "T4", "unlockLevel": 22, "unlockRequires": ["item:paper_blueprint"],
       "durationMin": 45, "xp": 145, "output": { "knowledge": 50 },
       "consume": { "paper_blueprint": 1 },
+      "staminaCost": 2, "region": "north_beach", "riskEvents": []
+    },
+    "decipher_notebook": {
+      "skill": "research", "tier": "T6", "unlockLevel": 55, "unlockRequires": ["item:paper_notebook"],
+      "durationMin": 60, "xp": 700, "output": { "knowledge": 80 },
+      "consume": { "paper_notebook": 1 },
       "staminaCost": 2, "region": "north_beach", "riskEvents": []
     }
   },
