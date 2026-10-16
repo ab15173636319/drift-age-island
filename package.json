@@ -2,26 +2,49 @@
   "name": "drift-age-island",
   "private": true,
   "version": "0.1.0",
+  "description": "《漂流纪元：孤岛》放置生存游戏",
+  "author": "Codex",
   "type": "module",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "start": "concurrently -k \"vite\" \"wait-on tcp:127.0.0.1:4321 && electron .\"",
+    "start:build": "bun run build && electron-builder"
   },
   "dependencies": {
-    "@tauri-apps/api": "^2.5.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "zustand": "^5.0.5"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.5.0",
     "@types/node": "^26.6.5",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
     "@vitejs/plugin-react": "^4.5.2",
+    "concurrently": "^10.0.6",
+    "electron": "^44.8.0",
+    "electron-builder": "^26.15.3",
     "typescript": "^5.8.3",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "wait-on": "^9.5.1"
+  },
+  "trustedDependencies": [
+    "electron"
+  ],
+  "build": {
+    "appId": "com.codex.driftageisland",
+    "productName": "漂流纪元-孤岛",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    }
   }
 }

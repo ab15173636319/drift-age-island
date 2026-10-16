@@ -497,6 +497,22 @@ export function availableActionsForSkill(state: GameState, skill: SkillId): Acti
     .sort((a, b) => a.unlockLevel - b.unlockLevel || a.xp - b.xp);
 }
 
+// 熟练度时长缩减：技能等级越高，同样的工作耗时越短（详见 plan/design/00_总览与数值基准.md 第三节）
+export const PROFICIENCY_REDUCTION_PER_LEVEL = 0.003; // 每级 -0.3%
+export const PROFICIENCY_REDUCTION_CAP = 0.3; // 上限 -30%
+
+export function proficiencyDurationFactor(level: number): number {
+  const reduction = Math.min(
+    Math.max(0, level) * PROFICIENCY_REDUCTION_PER_LEVEL,
+    PROFICIENCY_REDUCTION_CAP,
+  );
+  return 1 - reduction;
+}
+
+export function proficiencyDurationFor(level: number, baseDuration: number): number {
+  return baseDuration * proficiencyDurationFactor(level);
+}
+
 export function computeEfficiency(state: GameState, action: ActionDefinition): number {
   let efficiency = 1;
   const time = getGameTimeOfDayInfo(state.gameTimeMinutes);
@@ -514,6 +530,7 @@ export function computeEfficiency(state: GameState, action: ActionDefinition): n
   if (state.player.hunger <= 0) efficiency *= 0.5;
   if (state.skills[action.skill].mastery) efficiency *= 1.25;
   if (action.skill === "cooking" && getBuildingLevel(state, "firepit") > 0) efficiency *= 1.2;
+  efficiency /= proficiencyDurationFactor(state.skills[action.skill].level);
   return efficiency;
 }
 
@@ -734,7 +751,11 @@ export function settleActionSlot(
       }
     }
     addXp(state, action.skill, action.xp, logs);
-    advanceGameTime(state, action.durationSec, logs);
+    advanceGameTime(
+      state,
+      proficiencyDurationFor(state.skills[action.skill].level, action.durationSec),
+      logs,
+    );
     reduceFatigueForAction(state, action);
     if (state.player.thirst <= 0) {
       slot.paused = true;
@@ -1067,8 +1088,9 @@ export function craftRecipe(
   removeItems(state, recipe.input);
   addItems(state, recipe.output);
   addXp(state, recipe.skill, recipe.xp, logs);
-  advanceGameTime(state, recipe.durationSec, logs);
-  logs.push(createLog(`制作完成：${recipe.name}，花费 ${recipe.durationSec} 分钟`, "gain"));
+  const duration = proficiencyDurationFor(state.skills[recipe.skill].level, recipe.durationSec);
+  advanceGameTime(state, duration, logs);
+  logs.push(createLog(`制作完成：${recipe.name}，花费 ${Math.round(duration)} 分钟`, "gain"));
   checkAchievements(state, logs);
   return true;
 }
@@ -1095,7 +1117,7 @@ export function buildBuilding(
   state.buildings[buildingId] = currentLevel + 1;
   state.player.mood = Math.min(state.player.moodMax, state.player.mood + 8);
   addXp(state, "construction", 40 + currentLevel * 30, logs);
-  advanceGameTime(state, 120, logs);
+  advanceGameTime(state, proficiencyDurationFor(state.skills.construction.level, 120), logs);
   logs.push(createLog(`建造完成：${building.name} Lv${currentLevel + 1}`, "gain"));
   unlockRegions(state);
   checkAchievements(state, logs);

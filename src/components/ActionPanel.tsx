@@ -3,6 +3,7 @@ import {
   computeEfficiency,
   getAction,
   hasItems,
+  proficiencyDurationFor,
 } from "../game/core";
 import { SKILL_META, label } from "../game/staticData";
 import { useGame } from "../game/store";
@@ -18,6 +19,7 @@ function ActionRow({
 }) {
   const game = useGame((state) => state.game);
   const level = game.skills[action.skill].level;
+  const duration = proficiencyDurationFor(level, action.durationSec);
   const unlocked = level >= action.unlockLevel;
   const canRun = unlocked && (!action.consume || hasItems(game, action.consume));
   const isRunning = game.actionSlots.some(
@@ -43,7 +45,7 @@ function ActionRow({
         </div>
         <div className="action-numbers">
           <span>
-            {Math.round(action.durationSec)} 分钟 · {formatDuration(action.durationSec)}
+            {Math.round(duration)} 分钟 · {formatDuration(duration)}
           </span>
           <span>+{formatNumber(action.xp)} XP</span>
           {outputs && <span>{outputs}</span>}
